@@ -1,5 +1,25 @@
 // graphite.js
 
+function build_url(options) {
+    var url = options.url + "?";
+
+    // use random parameter to force image refresh
+    options["_t"] = options["_t"] || Math.random();
+
+    $.each(options, function (key, value) {
+        if (key === "target") {
+            $.each(value, function (index, value) {
+                url += "&target=" + value;
+            });
+        } else if (value !== null && key !== "url") {
+            url += "&" + key + "=" + value;
+        }
+    });
+
+    url = url.replace(/\?&/, "?");
+    return url;
+};
+
 (function ($) {
     $.fn.graphite = function (options) {
         if (options === "update") {
@@ -21,24 +41,7 @@
     };
 
     $.fn.graphite.render = function($img, options) {
-        // Render a new image. //
-        var src = options.url + "?";
-
-        // use random parameter to force image refresh
-        options["_t"] = options["_t"] || Math.random();
-
-        $.each(options, function (key, value) {
-            if (key === "target") {
-                $.each(value, function (index, value) {
-                    src += "&target=" + value;
-                });
-            } else if (value !== null && key !== "url") {
-                src += "&" + key + "=" + value;
-            }
-        });
-
-        src = src.replace(/\?&/, "?");
-        $img.attr("src", src);
+        $img.attr("src", build_url(options));
         $img.attr("height", options.height);
         $img.attr("width", options.width);
     };
