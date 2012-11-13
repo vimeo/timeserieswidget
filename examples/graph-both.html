@@ -1,0 +1,37 @@
+<html>
+    <head>
+        <script src="../jquery-1.8.2.min.js"></script>
+        <script src="../jquery.graphite.js"></script>
+        <script src="../rickshaw/vendor/d3.min.js"></script>
+        <script src="../rickshaw/vendor/d3.layout.min.js"></script>
+        <script src="../rickshaw/rickshaw.js"></script>
+        <script src="graph_defs_rickshaw.js"></script>
+        <script src="graph_defs_png.js"></script>
+        <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
+        <link type="text/css" rel="stylesheet" href="graph-rickshaw.css">
+    </head>
+    <body>
+        <!-- png -->
+        <img id="graph_png_fancy"/>
+        <script language="javascript">
+            $("#graph_png_fancy").graphite(graph_png_fancy);
+        </script>
+        <!-- rickshaw -->
+        <div id="chart_container">
+            <div id="y_axis"></div>
+            <div id="chart"></div>
+            <div id="legend"></div>
+            <form id="offset_form"></form>
+        </div>
+        <script language="javascript">
+            graph_rickshaw_fancy['legend'] = "legend";
+            graph_rickshaw_fancy['legend.toggle'] = true;
+            graph_rickshaw_fancy['legend.reorder'] = true;
+            graph_rickshaw_fancy['legend.highlight'] = true;
+            graph_rickshaw_fancy['hoover_details'] = true;
+            graph_rickshaw_fancy['y_axis'] = "y_axis";
+            graph_rickshaw_fancy['x_axis'] = true;
+            $("#chart").graphiteRick(graph_rickshaw_fancy, console.log);
+        </script>
+    </body>
+</html>

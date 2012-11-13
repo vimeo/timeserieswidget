@@ -30,7 +30,8 @@ $("#graph").graphiteRick({
 ### Advanced examples
 
 See 'examples' directory.  
-All example files are created so that you can easily diff between png and rickshaw implementations
+All example files are created so that you can easily diff between png and rickshaw implementations.
+There's also a file with both a png and rickshaw graph for easy comparison
 
 
 Note that graphite options for visual things (colors, areaMode, legends, etc) will be ignored,
