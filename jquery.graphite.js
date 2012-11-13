@@ -109,6 +109,11 @@ function build_url(options) {
                     element: document.getElementById(options['y_axis']),
                 });
             }
+            if(options['hoover_details']) {
+                var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                    graph: graph
+                } );
+            }
             graph.render();
             if (options['legend']) {
                 var legend = new Rickshaw.Graph.Legend({
@@ -119,6 +124,18 @@ function build_url(options) {
                     var shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
                         graph: graph,
                         legend: legend
+                    });
+                }
+                if(options['legend.reorder']) {
+                    var order = new Rickshaw.Graph.Behavior.Series.Order({
+                        graph: graph,
+                        legend: legend
+                    });
+                }
+                if(options['legend.highlight']) {
+                    var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
+                    graph: graph,
+                    legend: legend
                     });
                 }
             }
