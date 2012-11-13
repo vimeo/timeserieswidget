@@ -1,4 +1,4 @@
-graph_fancy = {
+graph_png_fancy = {
     url: "http://localhost:9000/render/",
     from: "-24hours",
     until: "now",
@@ -23,7 +23,7 @@ graph_fancy = {
     title: "render time histogram",
     vtitle: "rel. freq with scale adjustment per band"
 };
-graph_simple = {
+graph_png_simple = {
     url: "http://localhost:9000/render/",
     from: "-3minutes",
     until: "now",
