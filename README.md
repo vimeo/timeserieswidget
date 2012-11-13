@@ -1,9 +1,38 @@
 ## graphite.js
 
 Plugin to easily make graphs and update them on the fly using the 
-[Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html).
+[Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html).  
+Supports loading png's rendered by Graphite, as well as interactive svg-based client-side
+graphs (relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
 
-## How it works
+## Rickshaw client-side svg graphs
+
+### Basic
+```html
+<div id="graph">
+```
+
+```js
+$("#graph").graphiteRick({
+    from: "-24hours",
+    target: [
+        {data: "server.web1.load"},
+    ],
+});
+```
+
+### Advanced
+
+Note that graphite options for visual things (colors, areaMode, legends, etc) will be ignored,
+but we provide alternatives (work in progress though).  There's a bunch of options; for now just look them
+up in the source code.
+
+### TODO
+
+* timezone
+
+## Graphite PNG's
+### How it works
 
 One. Adding a graph to a page:
 
@@ -65,7 +94,7 @@ $("#graph").graphite({
 });
 ```
 
-## $(img).graphite(options)
+### $(img).graphite(options)
 
 You should probably specify a target. All other settings are optional. All
 settings will be passed through to the graphite api.
