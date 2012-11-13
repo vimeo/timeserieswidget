@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <script src="../jquery-1.8.2.min.js"></script>
+        <script src="../jquery.graphite.js"></script>
+        <script src="graph_defs_png.js"></script>
+    </head>
+    <body>
+        <img id="graph_png_simple"/>
+        <img id="graph_png_fancy"/>
+        <script language="javascript">
+            $("#graph_png_simple").graphite(graph_simple);
+            $("#graph_png_fancy").graphite(graph_fancy);
+        </script>
+    </body>
+</html>

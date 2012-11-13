@@ -7,7 +7,7 @@ graphs (relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
 
 ## Rickshaw client-side svg graphs
 
-### Basic
+### Minimal config
 ```html
 <div id="graph">
 ```
@@ -21,15 +21,22 @@ $("#graph").graphiteRick({
 });
 ```
 
-### Advanced
+### Advanced examples
+
+See 'examples' directory.  
+All example files are created so that you can easily diff between png and rickshaw implementations
+
 
 Note that graphite options for visual things (colors, areaMode, legends, etc) will be ignored,
 but we provide alternatives (work in progress though).  There's a bunch of options; for now just look them
 up in the source code.
 
+
 ### TODO
 
 * timezone
+* zoom, panning
+* annotations
 
 ## Graphite PNG's
 ### How it works

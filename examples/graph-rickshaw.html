@@ -1,0 +1,51 @@
+<html>
+    <head>
+        <script src="../jquery-1.8.2.min.js"></script>
+        <script src="../jquery.graphite.js"></script>
+        <script src="../rickshaw/vendor/d3.min.js"></script>
+        <script src="../rickshaw/vendor/d3.layout.min.js"></script>
+        <script src="../rickshaw/rickshaw.js"></script>
+        <script src="graph_defs_rickshaw.js"></script>
+        <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
+    </head>
+    <body>
+        <style>
+        #chart_container {
+            display: inline-block;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #chart {
+            float: left;
+        }
+        #legend {
+            float: left;
+            margin-left: 15px;
+        }
+        #offset_form {
+            float: left;
+            margin: 2em 0 0 15px;
+            font-size: 13px;
+        }
+        #y_axis {
+            float: left;
+            width: 40px;
+        }
+        </style>
+        <div id="chart_container">
+            <div id="y_axis"></div>
+            <div id="chart"></div>
+            <div id="legend"></div>
+            <form id="offset_form"></form>
+        </div>
+        <script language="javascript">
+            graph_fancy['legend'] = "legend";
+            graph_fancy['legend.toggle'] = true;
+            graph_fancy['legend.reorder'] = true;
+            graph_fancy['legend.highlight'] = true;
+            graph_fancy['hoover_details'] = true;
+            graph_fancy['y_axis'] = "y_axis";
+            graph_fancy['x_axis'] = true;
+            $("#chart").graphiteRick(graph_fancy, console.log);
+        </script>
+    </body>
+</html>
