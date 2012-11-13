@@ -139,15 +139,15 @@ function build_url(options) {
                     });
                 }
             }
-          }
-     $.ajax({
-        accepts: {text: 'application/json'},
-        cache: false,
-        dataType: 'jsonp',
-        jsonp: 'jsonp',
-        url: build_url(options) + '&format=json',
-        error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
-      }).done(drawRick);
+        }
+        $.ajax({
+            accepts: {text: 'application/json'},
+            cache: false,
+            dataType: 'jsonp',
+            jsonp: 'jsonp',
+            url: build_url(options) + '&format=json',
+            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+          }).done(drawRick);
     };
 
 
