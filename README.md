@@ -10,6 +10,8 @@ The goal is to turn this in a library which is easy to use, has an elegant but p
 and has all features you would expect; so that all graphite dashboards can rely on the same
 code to render client-side graphs, minimizing redundant work and combining efforts.
 
+![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/example-both.png)
+
 
 ## Rickshaw client-side svg graphs
 
@@ -32,6 +34,7 @@ $("#graph").graphiteRick({
 See 'examples' directory.  
 All example files are created so that you can easily diff between png and rickshaw implementations.
 There's also a file with both a png and rickshaw graph for easy comparison
+(this is used in the screenshot above)
 
 
 Note that graphite options for visual things (colors, areaMode, legends, etc) will be ignored,
