@@ -2,8 +2,14 @@
 
 Plugin to easily make graphs and update them on the fly using the 
 [Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html).  
-Supports loading png's rendered by Graphite, as well as interactive svg-based client-side
-graphs (relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
+Supports loading png's rendered by Graphite,
+as well as client-side rendering of interactive svg-based graphs
+(relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
+
+The goal is to turn this in a library which is easy to use, has an elegant but powerful api,
+and has all features you would expect; so that all graphite dashboards can rely on the same
+code to render client-side graphs, minimizing redundant work and combining efforts.
+
 
 ## Rickshaw client-side svg graphs
 
