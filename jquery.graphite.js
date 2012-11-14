@@ -139,6 +139,26 @@ function build_url(options) {
                     });
                 }
             }
+            if (options['line-stack-toggle']) {
+                var form = document.getElementById(options['line-stack-toggle']);
+                form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines" checked>' +
+                    '<label class="lines" for="lines">lines</label>' +
+                    '<input type="radio" name="offset" id="stack" value="zero">' +
+                    '<label class="stack" for="stack">stack</label>';
+
+                form.addEventListener('change', function(e) {
+                    var offsetMode = e.target.value;
+
+                    if (offsetMode == 'lines') {
+                        graph.setRenderer('line');
+                        graph.offset = 'zero';
+                    } else {
+                        graph.setRenderer('stack');
+                        graph.offset = offsetMode;
+                    }
+                    graph.render();
+                }, false);
+            }
         }
         $.ajax({
             accepts: {text: 'application/json'},
