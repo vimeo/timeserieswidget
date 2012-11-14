@@ -9,6 +9,9 @@ as well as client-side rendering of interactive svg-based graphs
 The goal is to turn this in a library which is easy to use, has an elegant but powerful api,
 and has all features you would expect; so that all graphite dashboards can rely on the same
 code to render client-side graphs, minimizing redundant work and combining efforts.
+Features like getting more info (in popups) when hoovering over datapoints, interactive zooming and panning,
+inspection of specific bands, reordering bands, toggling certain targets on and off,
+toggling between line vs stack (band) mode, etc.  Most of these already work, the others are coming soon
 
 ![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/example-both.png)
 
