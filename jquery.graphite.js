@@ -7,13 +7,13 @@ function build_url(options) {
     options["_t"] = options["_t"] || Math.random();
 
     $.each(options, function (key, value) {
-        if (key === "target") {
+        if (key === "target") { // png
             $.each(value, function (index, value) {
-                if (value.data) { // rickshaw's "target is a dictionary"
-                    url += "&target=" + value.data;
-                } else { // png's "target is a string
-                    url += "&target=" + value;
-                }
+                url += "&target=" + value;
+            });
+        } else if (key === "targets") { // rickshaw
+            $.each(value, function (index, value) {
+                    url += "&target=" + value.target;
             });
         } else if (value !== null && key !== "url") {
             url += "&" + key + "=" + value;
@@ -23,6 +23,31 @@ function build_url(options) {
     url = url.replace(/\?&/, "?");
     return url;
 };
+
+function find_definition (target_graphite, options) {
+    var matching_i = undefined;
+    for (var cfg_i = 0; cfg_i < options.targets.length && matching_i == undefined; cfg_i++) {
+        // alias in config
+        // currently this is not needed because we don't actually send aliases to graphite (yet)
+        if(options.targets[cfg_i].name != undefined && options.targets[cfg_i].name == target_graphite.target) {
+            matching_i = cfg_i;
+        }
+        // string match (no globbing)
+        else if(options.targets[cfg_i].target == target_graphite.target) {
+            matching_i = cfg_i;
+        }
+        // glob match?
+        else if(target_graphite.target.graphiteGlob(options.targets[cfg_i].target)) {
+            matching_i = cfg_i;
+        }
+    }
+    if (matching_i == undefined) {
+        console.error ("internal error: could not figure out which target_option target_graphite '" +
+                target_graphite.target + "' comes from");
+        return [];
+    }
+    return options.targets[matching_i];
+}
 
 (function ($) {
     $.fn.graphite = function (options) {
@@ -60,6 +85,13 @@ function build_url(options) {
         });
     };
 
+    // note: graphite json output is a list of dicts like:
+    // {"datapoints": [...], "target": "<metricname>" }
+    // if you did alias(series, "foo") then "target" will contain the alias
+    // (loosing the metricname which is bad, esp. when you had a glob with an alias, then you don't know what's what)
+    // rickshaw: options.series is a list of dicts like:
+    // { name: "alias", color: "foo", data: [{x: (...), y: (...)} , ...]}
+    // we basically tell users to use this dict, with extra 'target' to specify graphite target string
     $.fn.graphiteRick = function (options, on_error) {
         options = options || {};
         var settings = $.extend({}, $.fn.graphite.defaults, options);
@@ -77,18 +109,26 @@ function build_url(options) {
         $div.attr("height", options.height);
         $div.attr("width", options.width);
         var drawRick = function(response) {
-            if (response.length != options.target.length) {
-                error = "num requested targets: " + options.target.length +
-                        ", but # targets for which we received data: " + response.length;
-                return on_error (error);
-            }
+            // note that response.length can be != options.targets.length.  let's call:
+            // * target_graphite a targetstring as returned by graphite
+            // * target_option a targetstring configuration
+            // if a target_option contains * graphite will return all matches separately unless you use something to aggregate like sumSeries()
+            // we must render all target_graphite's, but we must merge in the config from the corresponding target_option.
+            // example: for a target_graphite 'stats.foo.bar' we must find a target_option 'stats.foo.bar' *or*
+            // anything that causes graphite to match it, such as 'stats.*.bar' (this would be a bit cleaner if graphite's json
+            // would include also the originally specified target string)
+            // note that this code assumes each target_graphite can only be originating from one target_option,
+            // in some unlikely cases this is not correct (there might be overlap between different target_options with globs)
+            // but in that case I don't see why taking the settings of any of the possible originating target_options wouldn't be fine.
             var all_targets = [];
-            for (var t = 0; t < response.length; t++) {
-                // create target objects from config we had, but the received datapoints merged in
-                var target = options.target[t];
+            if(response.length == 0 ) {
+                console.warn("no data in response");
+            }
+            for (var res_i = 0; res_i < response.length; res_i++) {
+                var target = find_definition(response[res_i], options);
                 target.data = [];
-                for (var i in response[t].datapoints) {
-                    target.data[i] = { x: response[t].datapoints[i][1], y: response[t].datapoints[i][0] || 0 };
+                for (var i in response[res_i].datapoints) {
+                    target.data[i] = { x: response[res_i].datapoints[i][1], y: response[res_i].datapoints[i][0] || 0 };
                 }
                 all_targets.push(target);
             }

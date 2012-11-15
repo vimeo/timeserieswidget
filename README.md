@@ -26,11 +26,17 @@ toggling between line vs stack (band) mode, etc.  Most of these already work, th
 ```js
 $("#graph").graphiteRick({
     from: "-24hours",
-    target: [
-        {data: "server.web1.load"},
+    targets: [
+        {target: "server.web1.load"},
     ],
 });
 ```
+
+Note: the code needs to be able to map targets returned from graphite back to your configuration, so:
+
+* if you have `scale()` in your targets, be wary of https://github.com/graphite-project/graphite-web/issues/103
+  and adjust your scales if needed.
+* don't use function aliases, i.e. use `sumSeries()`, not `sum()`
 
 ### Advanced examples
 
