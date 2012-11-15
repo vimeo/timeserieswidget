@@ -60,7 +60,7 @@ function build_url(options) {
         });
     };
 
-    $.fn.graphiteRick = function (options) {
+    $.fn.graphiteRick = function (options, on_error) {
         options = options || {};
         var settings = $.extend({}, $.fn.graphite.defaults, options);
 
@@ -68,7 +68,7 @@ function build_url(options) {
             $this = $(this);
 
             $this.data("graphOptions", settings);
-            $.fn.graphiteRick.render(this, settings);
+            $.fn.graphiteRick.render(this, settings, on_error);
         });
     };
 
@@ -80,7 +80,7 @@ function build_url(options) {
             if (response.length != options.target.length) {
                 error = "num requested targets: " + options.target.length +
                         ", but # targets for which we received data: " + response.length;
-                return or_error (error);
+                return on_error (error);
             }
             var all_targets = [];
             for (var t = 0; t < response.length; t++) {
