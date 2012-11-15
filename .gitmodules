@@ -1,3 +1,6 @@
 [submodule "rickshaw"]
 	path = rickshaw
 	url = git://github.com/shutterstock/rickshaw.git
+[submodule "flot"]
+	path = flot
+	url = git://github.com/flot/flot.git
