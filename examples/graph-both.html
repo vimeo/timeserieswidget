@@ -33,7 +33,7 @@
             graph_rickshaw_fancy['hoover_details'] = true;
             graph_rickshaw_fancy['y_axis'] = "y_axis";
             graph_rickshaw_fancy['x_axis'] = true;
-            $("#chart").graphiteRick(graph_rickshaw_fancy, console.log);
+            $("#chart").graphiteRick(graph_rickshaw_fancy, function(err) { console.log(err); });
         </script>
     </body>
 </html>
