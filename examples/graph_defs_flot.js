@@ -44,10 +44,9 @@ graph_flot_fancy = {
     ],
     title: "render time histogram",
     vtitle: "rel. freq with scale adjustment per band",
-    lines: { show: true, fill: true },
+    series: {stack: true, lines: { show: true, lineWidth: 0, fill: true }},
     xaxis: { mode: "time" },
     legend: { container: '#legend_flot', noColumns: 1 },
-    stack: 4,
 };
 graph_flot_simple = {
     url: "http://localhost:9000/render/",
