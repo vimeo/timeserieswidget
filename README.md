@@ -5,7 +5,7 @@ Plugin to easily make graphs and update them on the fly using
 allowing you to easily add:
 
 * Client-side rendered, interactive, canvas-based graphs
-  (relying on [Flot](http://www.flotcharts.org/)
+  (relying on [Flot](http://www.flotcharts.org/))
 * Client-side rendered, interactive, svg-based graphs
   (relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
 * PNG's rendered by Graphite
@@ -17,12 +17,78 @@ Goals:
 * provide all interactive features you would expect; so that all graphite dashboards can rely on the same
 code to render client-side graphs, minimizing redundant work and combining efforts.
 
-Interactive features (work in progress):
-* getting more info (in popups) when hoovering over datapoints
-* interactive zooming and panning
-* inspection of specific bands, reordering bands, toggling certain targets on and off
-* toggling between line vs stack (band) mode
-* etc
+Feature comparison table.
+NA = not available, WIP = work in progress
+
+<table>
+<tr>
+    <th></th>
+    <th>PNG</th>
+    <th>Flot</th>
+    <th>Rickshaw</th>
+</tr>
+<tr>
+    <td>description</td>
+    <td>Static PNG images rendered by graphite server</td>
+    <td>Interactive client-side rendering using canvas</td>
+    <td>Interactive client-side rendering using SVG</td>
+</tr>
+<tr>
+    <td>speed</td>
+    <td>quite fast</td>
+    <td>quite fast.  interactive features near-realtime</td>
+    <td>becomes slow with many datapoints and/or multiple graphs</td>
+</tr>
+<tr>
+    <td>hoover over datapoints/graph -> popup with exact data</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>Y</td>
+</tr>
+<tr>
+    <td>events with annotations</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>WIP</td>
+</tr>
+<tr>
+    <td>interactive zooming and panning</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>WIP</td>
+</tr>
+<tr>
+    <td>hoover over legend -> hilight on plot</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>Y</td>
+</tr>
+<tr>
+    <td>reordering items in legend to reorder on stacked plot</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>Y</td>
+</tr>
+<tr>
+    <td>toggling targets on/off</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>Y</td>
+</tr>
+<tr>
+    <td>toggling between line vs stack (band) mode</td>
+    <td>NA</td>
+    <td>WIP</td>
+    <td>Y</td>
+</tr>
+<tr>
+    <td>notes</td>
+    <td>1999 called. they want their static images back.<br/>
+    you could actually implement these features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
+    <td>flot seems to have a tad more features than rickshaw</td>
+    <td>more "generic" (based on D3), all data is accessible in DOM and themeable with CSS</td>
+</tr>
+</table>
 
 **any web code that can generate graphite urls can use this library with minimal transition work**
 
