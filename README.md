@@ -12,6 +12,7 @@ code to render client-side graphs, minimizing redundant work and combining effor
 Features like getting more info (in popups) when hoovering over datapoints, interactive zooming and panning,
 inspection of specific bands, reordering bands, toggling certain targets on and off,
 toggling between line vs stack (band) mode, etc.  Most of these already work, the others are coming soon
+**any web code that can generate graphite urls can use this library with minimal transition work**
 
 ![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/example-both.png)
 
