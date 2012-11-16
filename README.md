@@ -14,7 +14,7 @@ inspection of specific bands, reordering bands, toggling certain targets on and 
 toggling between line vs stack (band) mode, etc.  Most of these already work, the others are coming soon
 **any web code that can generate graphite urls can use this library with minimal transition work**
 
-![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/example-both.png)
+![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshot-compare.png)
 
 ## Flot client-side canvas graphs
 
