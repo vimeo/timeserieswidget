@@ -202,27 +202,27 @@ function find_definition (target_graphite, options) {
                     graph: graph,
                     element: document.getElementById(options['legend'])
                 });
-                if(options['legend.toggle']) {
+                if(options['legend_toggle']) {
                     var shelving = new Rickshaw.Graph.Behavior.Series.Toggle({
                         graph: graph,
                         legend: legend
                     });
                 }
-                if(options['legend.reorder']) {
+                if(options['legend_reorder']) {
                     var order = new Rickshaw.Graph.Behavior.Series.Order({
                         graph: graph,
                         legend: legend
                     });
                 }
-                if(options['legend.highlight']) {
+                if(options['legend_highlight']) {
                     var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight({
                     graph: graph,
                     legend: legend
                     });
                 }
             }
-            if (options['line-stack-toggle']) {
-                var form = document.getElementById(options['line-stack-toggle']);
+            if (options['line_stack_toggle']) {
+                var form = document.getElementById(options['line_stack_toggle']);
                 form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines" checked>' +
                     '<label class="lines" for="lines">lines</label>' +
                     '<input type="radio" name="offset" id="stack" value="zero">' +
