@@ -220,9 +220,16 @@ function find_definition (target_graphite, options) {
             }
             if (options['line_stack_toggle']) {
                 var form = document.getElementById(options['line_stack_toggle']);
-                form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines" checked>' +
+                if(!options['renderer'] || options['renderer'] == 'area') {
+                    lines_checked = '';
+                    stack_checked = ' checked';
+                } else {
+                    lines_checked = ' checked';
+                    stack_checked = '';
+                }
+                form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines"'+ lines_checked +'>' +
                     '<label class="lines" for="lines">lines</label>' +
-                    '<br/><input type="radio" name="offset" id="stack" value="zero">' +
+                    '<br/><input type="radio" name="offset" id="stack" value="zero"' + stack_checked + '>' +
                     '<label class="stack" for="stack">stack</label>';
 
                 form.addEventListener('change', function(e) {
