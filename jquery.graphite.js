@@ -174,12 +174,9 @@ function find_definition (target_graphite, options) {
                 }
                 all_targets.push(target);
             }
-            var graph = new Rickshaw.Graph({
-                element: div,
-                height: options.height,
-                width: options.width,
-                series: all_targets
-            });
+            options['element'] = div;
+            options['series'] = all_targets
+            var graph = new Rickshaw.Graph(options);
             if(options['x_axis']) {
                 var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
             }
