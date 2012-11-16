@@ -15,6 +15,10 @@ toggling between line vs stack (band) mode, etc.  Most of these already work, th
 
 ![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/example-both.png)
 
+## Flot client-side canvas graphs
+
+see examples
+
 
 ## Rickshaw client-side svg graphs
 

@@ -7,19 +7,31 @@
         <script src="../rickshaw/vendor/d3.min.js"></script>
         <script src="../rickshaw/vendor/d3.layout.min.js"></script>
         <script src="../rickshaw/rickshaw.js"></script>
-        <script src="graph_defs_rickshaw.js"></script>
         <script src="graph_defs_png.js"></script>
+        <script src="graph_defs_rickshaw.js"></script>
+        <script src="graph_defs_flot.js"></script>
         <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
         <link type="text/css" rel="stylesheet" href="graph-rickshaw.css">
+        <script src="../flot/jquery.flot.js"></script>
+        <script src="../flot/jquery.flot.selection.js"></script>
+        <script src="../flot/jquery.flot.time.js"></script>
+        <script src="../flot/jquery.flot.stack.js"></script>
     </head>
     <body>
-        <!-- png -->
+        <h2>Graphite PNG</h2>
         <img id="graph_png_fancy"/>
         <script language="javascript">
             $("#graph_png_fancy").graphite(graph_png_fancy);
         </script>
-        <br/><br/>
-        <!-- rickshaw -->
+        <h2>Flot</h2>
+        <div id="chart_container_flot">
+            <div id="chart_flot"></div>
+            <form id="offset_form_flot"></form>
+        </div>
+        <script language="javascript">
+            $("#chart_flot").graphiteFlot(graph_flot_fancy, function(err) { console.log(err); });
+        </script>
+        <h2>Rickshaw</h2>
         <div id="chart_container">
             <div id="y_axis"></div>
             <div id="chart"></div>

@@ -1,0 +1,22 @@
+<html><head>
+        <script src="../flot/jquery.js"></script>
+        <script src="../jquery.graphite.js"></script>
+        <script src="../graphite_helpers.js"></script>
+        <script src="../flot/jquery.flot.js"></script>
+        <script src="../flot/jquery.flot.selection.js"></script>
+        <script src="../flot/jquery.flot.time.js"></script>
+        <script src="../flot/jquery.flot.stack.js"></script>
+        <script src="graph_defs_flot.js"></script>
+    </head>
+    <body>
+        <div id="chart_container">
+            <div id="y_axis"></div>
+            <div id="chart" height="300px" width="700px"></div>
+            <div id="legend"></div>
+            <form id="line_stack_form" class="toggler"></form>
+        </div>
+        <script language="javascript">
+            $("#chart").graphiteFlot(graph_flot_fancy, function(err) { console.log(err); });
+        </script>
+    </body>
+</html>

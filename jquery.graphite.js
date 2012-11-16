@@ -92,16 +92,58 @@ function find_definition (target_graphite, options) {
     // rickshaw: options.series is a list of dicts like:
     // { name: "alias", color: "foo", data: [{x: (...), y: (...)} , ...]}
     // we basically tell users to use this dict, with extra 'target' to specify graphite target string
+    // flot: d = [[<ts>, <val>], (...)]
+    // plot ($(..), [d], ..)
     $.fn.graphiteRick = function (options, on_error) {
         options = options || {};
         var settings = $.extend({}, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
-
             $this.data("graphOptions", settings);
             $.fn.graphiteRick.render(this, settings, on_error);
         });
+    };
+
+    $.fn.graphiteFlot = function (options, on_error) {
+        options = options || {};
+        var settings = $.extend({}, $.fn.graphite.defaults, options);
+
+        return this.each(function () {
+            $this = $(this);
+            $this.data("graphOptions", settings);
+            $.fn.graphiteFlot.render(this, settings, on_error);
+        });
+    };
+
+    $.fn.graphiteFlot.render = function(div, options, on_error) {
+        $div = $(div);
+        $div.height(options.height);
+        $div.width(options.width);
+        var drawFlot = function(response) {
+            var all_targets = [];
+            if(response.length == 0 ) {
+                console.warn("no data in response");
+            }
+            for (var res_i = 0; res_i < response.length; res_i++) {
+                var target = find_definition(response[res_i], options);
+                target.label = target.name // flot wants 'label'
+                target.data = [];
+                for (var i in response[res_i].datapoints) {
+                    target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0] || 0 ];
+                }
+                all_targets.push(target);
+            }
+            $.plot(div, all_targets, options);
+        }
+        $.ajax({
+            accepts: {text: 'application/json'},
+            cache: false,
+            dataType: 'jsonp',
+            jsonp: 'jsonp',
+            url: build_url(options) + '&format=json',
+            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+        }).done(drawFlot);
     };
 
     $.fn.graphiteRick.render = function(div, options, on_error) {
