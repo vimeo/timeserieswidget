@@ -9,17 +9,17 @@
         <script src="../rickshaw/rickshaw.js"></script>
         <script src="graph_defs_rickshaw.js"></script>
         <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
-        <link type="text/css" rel="stylesheet" href="graph-rickshaw.css">
+        <link type="text/css" rel="stylesheet" href="../graphitejs.css">
     </head>
     <body>
-        <div id="chart_container">
-            <div id="y_axis"></div>
-            <div id="chart"></div>
-            <div id="legend"></div>
-            <form id="line_stack_form" class="toggler"></form>
+        <div class="chart_container rickshaw" id="chart_container_rickshaw">
+            <div class="chart_y_axis" id="y_axis_rickshaw"></div>
+            <div class="chart" id="chart_rickshaw"></div>
+            <div class="legend" id="legend_rickshaw"></div>
+            <form class="toggler" id="line_stack_form_rickshaw"></form>
         </div>
         <script language="javascript">
-            $("#chart").graphiteRick(graph_rickshaw_fancy, function(err) { console.log(err); });
+            $("#chart_rickshaw").graphiteRick(graph_rickshaw_fancy, function(err) { console.log(err); });
         </script>
     </body>
 </html>

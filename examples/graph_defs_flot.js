@@ -46,7 +46,7 @@ graph_flot_fancy = {
     vtitle: "rel. freq with scale adjustment per band",
     lines: { show: true, fill: true },
     xaxis: { mode: "time" },
-    legend: { noColumns: 2 },
+    legend: { container: '#legend_flot', noColumns: 1 },
     stack: 4,
 };
 graph_flot_simple = {

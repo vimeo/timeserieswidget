@@ -225,7 +225,7 @@ function find_definition (target_graphite, options) {
                 var form = document.getElementById(options['line_stack_toggle']);
                 form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines" checked>' +
                     '<label class="lines" for="lines">lines</label>' +
-                    '<input type="radio" name="offset" id="stack" value="zero">' +
+                    '<br/><input type="radio" name="offset" id="stack" value="zero">' +
                     '<label class="stack" for="stack">stack</label>';
 
                 form.addEventListener('change', function(e) {

@@ -11,11 +11,11 @@
         <script src="graph_defs_rickshaw.js"></script>
         <script src="graph_defs_flot.js"></script>
         <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
-        <link type="text/css" rel="stylesheet" href="graph-rickshaw.css">
         <script src="../flot/jquery.flot.js"></script>
         <script src="../flot/jquery.flot.selection.js"></script>
         <script src="../flot/jquery.flot.time.js"></script>
         <script src="../flot/jquery.flot.stack.js"></script>
+        <link type="text/css" rel="stylesheet" href="../graphitejs.css">
     </head>
     <body>
         <h2>Graphite PNG</h2>
@@ -24,22 +24,23 @@
             $("#graph_png_fancy").graphite(graph_png_fancy);
         </script>
         <h2>Flot</h2>
-        <div id="chart_container_flot">
-            <div id="chart_flot"></div>
-            <form id="offset_form_flot"></form>
+
+        <div class="chart_container flot" id="chart_container_flot">
+            <div class="chart" id="chart_flot" height="300px" width="700px"></div>
+            <div class="legend" id="legend_flot"></div>
         </div>
         <script language="javascript">
             $("#chart_flot").graphiteFlot(graph_flot_fancy, function(err) { console.log(err); });
         </script>
         <h2>Rickshaw</h2>
-        <div id="chart_container">
-            <div id="y_axis"></div>
-            <div id="chart"></div>
-            <div id="legend"></div>
-            <form id="line_stack_form" class="toggler"></form>
+        <div class="chart_container rickshaw" id="chart_container_rickshaw">
+            <div class="chart_y_axis" id="y_axis_rickshaw"></div>
+            <div class="chart" id="chart_rickshaw"></div>
+            <div class="legend" id="legend_rickshaw"></div>
+            <form class="toggler" id="line_stack_form_rickshaw"></form>
         </div>
         <script language="javascript">
-            $("#chart").graphiteRick(graph_rickshaw_fancy, function(err) { console.log(err); });
+            $("#chart_rickshaw").graphiteRick(graph_rickshaw_fancy, function(err) { console.log(err); });
         </script>
     </body>
 </html>

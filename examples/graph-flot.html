@@ -7,16 +7,15 @@
         <script src="../flot/jquery.flot.time.js"></script>
         <script src="../flot/jquery.flot.stack.js"></script>
         <script src="graph_defs_flot.js"></script>
+        <link type="text/css" rel="stylesheet" href="../graphitejs.css">
     </head>
     <body>
-        <div id="chart_container">
-            <div id="y_axis"></div>
-            <div id="chart" height="300px" width="700px"></div>
-            <div id="legend"></div>
-            <form id="line_stack_form" class="toggler"></form>
+        <div class="chart_container flot" id="chart_container_flot">
+            <div class="chart" id="chart_flot" height="300px" width="700px"></div>
+            <div class="legend" id="legend_flot" height="300px" width="50px" style="height:300px; width: 50px"></div>
         </div>
         <script language="javascript">
-            $("#chart").graphiteFlot(graph_flot_fancy, function(err) { console.log(err); });
+            $("#chart_flot").graphiteFlot(graph_flot_fancy, function(err) { console.log(err); });
         </script>
     </body>
 </html>

@@ -42,13 +42,13 @@ graph_rickshaw_fancy = {
          target: "scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),60.0)"
         }
     ],
-    legend: 'legend',
+    legend: 'legend_rickshaw',
     legend_toggle: true,
     legend_reorder: true,
     legend_highlight: true,
     hoover_details: true,
-    line_stack_toggle: 'line_stack_form',
-    y_axis: 'y_axis',
+    line_stack_toggle: 'line_stack_form_rickshaw',
+    y_axis: 'y_axis_rickshaw',
     x_axis: true,
     title: "render time histogram",
     vtitle: "rel. freq with scale adjustment per band"
