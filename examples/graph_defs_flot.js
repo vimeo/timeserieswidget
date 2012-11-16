@@ -42,6 +42,7 @@ graph_flot_fancy = {
          target: "scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),60.0)"
         }
     ],
+    line_stack_toggle: 'line_stack_form_flot',
     title: "render time histogram",
     vtitle: "rel. freq with scale adjustment per band",
     series: {stack: true, lines: { show: true, lineWidth: 0, fill: true }},

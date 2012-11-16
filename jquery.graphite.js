@@ -135,6 +135,30 @@ function find_definition (target_graphite, options) {
                 all_targets.push(target);
             }
             $.plot(div, all_targets, options);
+            if (options['line_stack_toggle']) {
+                var form = document.getElementById(options['line_stack_toggle']);
+                if(options['series']['stack']) {
+                    lines_checked = '';
+                    stack_checked = ' checked';
+                } else {
+                    lines_checked = ' checked';
+                    stack_checked = '';
+                }
+                form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines"'+ lines_checked +'>' +
+                    '<label class="lines" for="lines">lines</label>' +
+                    '<br/><input type="radio" name="offset" id="stack" value="zero"' + stack_checked + '>' +
+                    '<label class="stack" for="stack">stack</label>';
+
+                form.addEventListener('change', function(e) {
+                    var offsetMode = e.target.value;
+                    if (offsetMode == 'lines') {
+                        options['series']['stack'] = null; // flot lib wants 0 or null. not false o_O
+                    } else {
+                        options['series']['stack'] = true;
+                    }
+                    $.plot(div, all_targets, options);
+                }, false);
+            }
         }
         $.ajax({
             accepts: {text: 'application/json'},

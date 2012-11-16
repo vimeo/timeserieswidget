@@ -78,7 +78,7 @@ NA = not available, WIP = work in progress
 <tr>
     <td>toggling between line vs stack (band) mode</td>
     <td>NA</td>
-    <td>WIP</td>
+    <td>Y</td>
     <td>Y</td>
 </tr>
 <tr>
