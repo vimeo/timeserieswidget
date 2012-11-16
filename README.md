@@ -1,17 +1,29 @@
 ## graphite.js
 
-Plugin to easily make graphs and update them on the fly using the 
-[Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html).  
-Supports loading png's rendered by Graphite,
-as well as client-side rendering of interactive svg-based graphs
-(relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
+Plugin to easily make graphs and update them on the fly using
+[Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html) on the background,
+allowing you to easily add:
 
-The goal is to turn this in a library which is easy to use, has an elegant but powerful api,
-and has all features you would expect; so that all graphite dashboards can rely on the same
+* Client-side rendered, interactive, canvas-based graphs
+  (relying on [Flot](http://www.flotcharts.org/)
+* Client-side rendered, interactive, svg-based graphs
+  (relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
+* PNG's rendered by Graphite
+
+Goals:
+* easy to use, elegant but powerful api.
+* only abstract where it makes sense.  Graphite, Flot, and Rickshaw api's are awesome and powerfull, expose them
+* aim for some consistency in configuration across backends (to the extent possible and sane)
+* provide all interactive features you would expect; so that all graphite dashboards can rely on the same
 code to render client-side graphs, minimizing redundant work and combining efforts.
-Features like getting more info (in popups) when hoovering over datapoints, interactive zooming and panning,
-inspection of specific bands, reordering bands, toggling certain targets on and off,
-toggling between line vs stack (band) mode, etc.  Most of these already work, the others are coming soon
+
+Interactive features (work in progress):
+* getting more info (in popups) when hoovering over datapoints
+* interactive zooming and panning
+* inspection of specific bands, reordering bands, toggling certain targets on and off
+* toggling between line vs stack (band) mode
+* etc
+
 **any web code that can generate graphite urls can use this library with minimal transition work**
 
 ![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshot-compare.png)
