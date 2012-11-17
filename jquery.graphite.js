@@ -121,7 +121,17 @@ function find_definition (target_graphite, options) {
         $div.height(options.height);
         $div.width(options.width);
         var drawFlot = function(response) {
+            var plot = function() {
+                var targets = [];
+                for (var i = 0; i < all_targets.length; i++) {
+                    if (all_targets[i].enabled) {
+                        targets.push(all_targets[i]);
+                    }
+                }
+                $.plot(div, targets, options);
+            }
             var all_targets = [];
+            var all_targets_index = {}; // create a name -> index in all_targets dict
             if(response.length == 0 ) {
                 console.warn("no data in response");
             }
@@ -132,9 +142,38 @@ function find_definition (target_graphite, options) {
                 for (var i in response[res_i].datapoints) {
                     target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0] || 0 ];
                 }
+                target.enabled = true;
                 all_targets.push(target);
+                all_targets_index[target.name] = all_targets.length - 1;
             }
-            $.plot(div, all_targets, options);
+            // this feature is broken, series disappear from the legend too, when we want to disable them
+            if(options['legend_toggle']) {
+                // this must be set before plotting
+                options['legend']['labelFormatter'] = function(label, series) {
+                    return '<input type="checkbox" name="' + label + '"+ id="id' + label + '" checked>' + label + '</input>';
+                };
+            }
+            plot();
+            if(options['legend_toggle']) {
+                // so this feature depends on having legend in a sep. container!
+                // we should probably enforce the sep. container thing.
+                // also, the input elements only exist after plotting.
+                var choiceContainer = $(options['legend']['container']);
+                console.debug(choiceContainer);
+                console.debug(choiceContainer.find('table'));
+                function plotAccordingToChoices() {
+                    console.log('ok');
+                    for (var i = 0; i < all_targets.length; i++) {
+                        all_targets[i].enabled = false;
+                    }
+                    choiceContainer.find("input:checked").each(function () {
+                        var name = $(this).attr("name");
+                        all_targets[all_targets_index[name]].enabled = true;
+                    });
+                    plot();
+                }
+                choiceContainer.find("input").click(plotAccordingToChoices);
+            }
             if (options['line_stack_toggle']) {
                 var form = document.getElementById(options['line_stack_toggle']);
                 if(options['series']['stack']) {
