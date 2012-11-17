@@ -42,7 +42,7 @@ NA = not available, WIP = work in progress
 <tr>
     <td>hoover over datapoints/graph -> popup with exact data</td>
     <td>NA</td>
-    <td>WIP</td>
+    <td>WIP (<a href="https://github.com/flot/flot/pull/867">flot pull 867</a>)</td>
     <td>Y</td>
 </tr>
 <tr>
@@ -72,7 +72,9 @@ NA = not available, WIP = work in progress
 <tr>
     <td>toggling targets on/off</td>
     <td>NA</td>
-    <td>WIP</td>
+    <td>WIP (<a href="https://github.com/flot/flot/pull/848">flot pull 848</a>,
+             <a href="https://github.com/flot/flot/issues/869">flot pull 869</a>,
+             <a href="https://github.com/Dieterbe/graphitejs/tree/flot-legend-toggle">branch flot-legend-toggle</a>)</td>
     <td>Y</td>
 </tr>
 <tr>
