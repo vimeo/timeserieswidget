@@ -123,6 +123,10 @@ Note: the code needs to be able to map targets returned from graphite back to yo
   and adjust your scales if needed.
 * don't use function aliases, i.e. use `sumSeries()`, not `sum()`
 
+You need to check this if you see an error like
+`internal error: could not figure out which target_option target_graphite '<a target returned from graphite>' comes from`.
+You'll probably notice that it looks slightly different from what you configured, and graphite changed it a bit.
+
 ### Advanced examples
 
 See 'examples' directory.  
