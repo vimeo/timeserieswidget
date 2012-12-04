@@ -1,5 +1,25 @@
-graph_flot_fancy = {
-    url: "http://localhost:9000/render/",
+graph_flot_simple_line = {
+    url: "http://<graphite hostname:port>/render/",
+    from: "-24hours",
+    until: "now",
+    height: "300",
+    width: "740",
+    targets: [
+        {name: 'get',
+        color: 'green',
+        target: 'sumSeries(stats.*.memcached_*_get)',
+        },
+        {name: 'miss',
+        color: 'red',
+        target: 'sumSeries(stats.*.memcached_*_miss)'
+        }
+    ],
+    title: 'Memcache',
+    vtitle: 'requests/second',
+    xaxis: { mode: "time" },
+};
+graph_flot_fancy_stacked = {
+    url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",
@@ -43,29 +63,10 @@ graph_flot_fancy = {
         }
     ],
     line_stack_toggle: 'line_stack_form_flot',
-    title: "render time histogram",
+    title: "render time histogram (stacked graph)",
     vtitle: "rel. freq with scale adjustment per band",
-    series: {stack: true, lines: { show: true, lineWidth: 0, fill: true }},
     xaxis: { mode: "time" },
+    state: 'stacked',
     legend: { container: '#legend_flot', noColumns: 1 },
-};
-graph_flot_simple = {
-    url: "http://localhost:9000/render/",
-    from: "-3minutes",
-    until: "now",
-    height: "300",
-    width: "740",
-    targets: [
-        {name: '0.01',
-        color: "#2FFF00",
-        target: "scale(divideSeries(stats.timers.render_time.bin_0_01,stats.timers.render_time.count),0.01)"
-        },
-        {name: 'inf',
-        color: '#FF0000',
-        target: "scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),60)"
-        }
-    ],
-    title: "render time histogram",
-    vtitle: "rel. freq with scale adjustment per band"
 };
 

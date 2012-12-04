@@ -134,29 +134,44 @@ function find_definition (target_graphite, options) {
                 }
                 all_targets.push(target);
             }
-            $.plot(div, all_targets, options);
+            // default config state modifiers (you can override them in your config objects)
+            var states = {
+                'stacked': {
+                    'series': {'stack': true, 'lines': {'show': true, 'lineWidth': 0, 'fill': true }},
+                },
+                'lines': {
+                    // flot lib wants 0 or null. not false o_O
+                    'series': {'stack': null, 'lines': { 'show': true, 'lineWidth': 0.6, 'fill': false }}
+                }
+            };
+            if(! 'states' in options) {
+                options['states'] = {};
+            }
+            options['states'] = $.extend(options['states'], states);
+
+            var buildFlotOptions = function(options) {
+                state = options['state'] || 'lines';
+                return $.extend(options, options['states'][state]);
+            }
+            $.plot(div, all_targets, buildFlotOptions(options));
             if (options['line_stack_toggle']) {
                 var form = document.getElementById(options['line_stack_toggle']);
-                if(options['series']['stack']) {
+                if(options['state'] == 'stacked') {
                     lines_checked = '';
-                    stack_checked = ' checked';
+                    stacked_checked = ' checked';
                 } else {
                     lines_checked = ' checked';
-                    stack_checked = '';
+                    stacked_checked = '';
                 }
                 form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines"'+ lines_checked +'>' +
                     '<label class="lines" for="lines">lines</label>' +
-                    '<br/><input type="radio" name="offset" id="stack" value="zero"' + stack_checked + '>' +
+                    '<br/><input type="radio" name="offset" id="stacked" value="stacked"' + stacked_checked + '>' +
                     '<label class="stack" for="stack">stack</label>';
 
                 form.addEventListener('change', function(e) {
-                    var offsetMode = e.target.value;
-                    if (offsetMode == 'lines') {
-                        options['series']['stack'] = null; // flot lib wants 0 or null. not false o_O
-                    } else {
-                        options['series']['stack'] = true;
-                    }
-                    $.plot(div, all_targets, options);
+                    var mode = e.target.value;
+                    options['state'] = mode;
+                    $.plot(div, all_targets, buildFlotOptions(options));
                 }, false);
             }
         }

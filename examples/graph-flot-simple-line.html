@@ -1,0 +1,20 @@
+<html><head>
+        <script src="../flot/jquery.js"></script>
+        <script src="../jquery.graphite.js"></script>
+        <script src="../graphite_helpers.js"></script>
+        <script src="../flot/jquery.flot.js"></script>
+        <script src="../flot/jquery.flot.selection.js"></script>
+        <script src="../flot/jquery.flot.time.js"></script>
+        <script src="../flot/jquery.flot.stack.js"></script>
+        <script src="graph_defs_flot.js"></script>
+        <link type="text/css" rel="stylesheet" href="../graphitejs.css">
+    </head>
+    <body>
+        <div class="chart_container flot" id="chart_container_flot">
+            <div class="chart" id="chart_flot" height="300px" width="700px"></div>
+        </div>
+        <script language="javascript">
+            $("#chart_flot").graphiteFlot(graph_flot_simple_line, function(err) { console.log(err); });
+        </script>
+    </body>
+</html>
