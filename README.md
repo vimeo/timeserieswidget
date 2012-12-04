@@ -96,6 +96,28 @@ NA = not available, WIP = work in progress
 
 ![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshot-compare.png)
 
+## Notes for client-side graph rendering / troubleshooting
+
+### Configuration of graphite server / If you don't seem to get any actual data
+
+you'll need a small tweak to allow this app to request data from graphite. (we could use jsonp, but see https://github.com/obfuscurity/tasseo/pull/27)
+For apache2 this works:
+
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "origin, authorization, accept"
+
+### The code needs to be able to map targets returned from graphite back to your configuration, so:
+
+* if you have `scale()`, `movingAverage()` and potentially a few more in your targets, be wary of https://github.com/graphite-project/graphite-web/issues/103
+  and adjust your scales if needed to counter graphite's rewriting of arguments.
+* don't use function aliases, i.e. use `sumSeries()`, not `sum()`
+
+You need to check this if you see an error like
+`internal error: could not figure out which target_option target_graphite '<a target returned from graphite>' comes from`.
+You'll probably notice that it looks slightly different from what you configured, and graphite changed it a bit.
+
+
 ## Flot client-side canvas graphs
 
 see examples
@@ -116,16 +138,6 @@ $("#graph").graphiteRick({
     ],
 });
 ```
-
-Note: the code needs to be able to map targets returned from graphite back to your configuration, so:
-
-* if you have `scale()` in your targets, be wary of https://github.com/graphite-project/graphite-web/issues/103
-  and adjust your scales if needed.
-* don't use function aliases, i.e. use `sumSeries()`, not `sum()`
-
-You need to check this if you see an error like
-`internal error: could not figure out which target_option target_graphite '<a target returned from graphite>' comes from`.
-You'll probably notice that it looks slightly different from what you configured, and graphite changed it a bit.
 
 ### Advanced examples
 
