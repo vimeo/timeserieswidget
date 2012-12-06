@@ -1,5 +1,5 @@
 graph_rickshaw_fancy = {
-    url: "http://localhost:9000/render/",
+    url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",
@@ -54,7 +54,7 @@ graph_rickshaw_fancy = {
     vtitle: "rel. freq with scale adjustment per band"
 };
 graph_rickshaw_simple = {
-    url: "http://localhost:9000/render/",
+    url: "http://<graphite hostname:port>/render/",
     from: "-3minutes",
     until: "now",
     height: "300",
