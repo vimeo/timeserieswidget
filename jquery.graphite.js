@@ -137,7 +137,7 @@ function find_definition (target_graphite, options) {
             // default config state modifiers (you can override them in your config objects)
             var states = {
                 'stacked': {
-                    'series': {'stack': true, 'lines': {'show': true, 'lineWidth': 0, 'fill': true }},
+                    'series': {'stack': true, 'lines': {'show': true, 'lineWidth': 0, 'fill': 1}},
                 },
                 'lines': {
                     // flot lib wants 0 or null. not false o_O
