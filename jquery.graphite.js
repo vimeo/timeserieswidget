@@ -58,6 +58,10 @@ function find_definition (target_graphite, options) {
 }
 
 (function ($) {
+    var default_graphite_options = {
+        'fgcolor' : '#ffffff'
+    }
+
     $.fn.graphite = function (options) {
         if (options === "update") {
             $.fn.graphite.update(this, arguments[1]);
@@ -104,7 +108,7 @@ function find_definition (target_graphite, options) {
     // plot ($(..), [d], ..)
     $.fn.graphiteRick = function (options, on_error) {
         options = options || {};
-        var settings = $.extend({}, $.fn.graphite.defaults, options);
+        var settings = $.extend({}, default_graphite_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
@@ -115,7 +119,7 @@ function find_definition (target_graphite, options) {
 
     $.fn.graphiteFlot = function (options, on_error) {
         options = options || {};
-        var settings = $.extend({}, $.fn.graphite.defaults, options);
+        var settings = $.extend({}, default_graphite_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
@@ -158,7 +162,8 @@ function find_definition (target_graphite, options) {
             options['states'] = $.extend(options['states'], states);
 
             var buildFlotOptions = function(options) {
-                options['xaxis'] = {mode: 'time'};
+                options['xaxis'] = { color: options['fgcolor'], mode: 'time'};
+                options['yaxis'] = { color: options['fgcolor']};
                 if('title' in options) {
                     options['xaxes'] = [{axisLabel: options['title']}];
                 }
