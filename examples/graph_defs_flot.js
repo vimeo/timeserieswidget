@@ -16,7 +16,6 @@ graph_flot_simple_line = {
     ],
     title: 'Memcache',
     vtitle: 'requests/second',
-    xaxis: { mode: "time" },
 };
 graph_flot_fancy_stacked = {
     url: "http://<graphite hostname:port>/render/",
@@ -65,7 +64,6 @@ graph_flot_fancy_stacked = {
     line_stack_toggle: 'line_stack_form_flot',
     title: "render time histogram (stacked graph)",
     vtitle: "rel. freq with scale adjustment per band",
-    xaxis: { mode: "time" },
     state: 'stacked',
     legend: { container: '#legend_flot', noColumns: 1 },
 };

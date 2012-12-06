@@ -158,6 +158,7 @@ function find_definition (target_graphite, options) {
             options['states'] = $.extend(options['states'], states);
 
             var buildFlotOptions = function(options) {
+                options['xaxis'] = {mode: 'time'};
                 if('title' in options) {
                     options['xaxes'] = [{axisLabel: options['title']}];
                 }
