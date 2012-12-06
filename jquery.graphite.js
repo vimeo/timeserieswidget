@@ -150,6 +150,12 @@ function find_definition (target_graphite, options) {
             options['states'] = $.extend(options['states'], states);
 
             var buildFlotOptions = function(options) {
+                if('title' in options) {
+                    options['xaxes'] = [{axisLabel: options['title']}];
+                }
+                if('vtitle' in options) {
+                    options['yaxes'] = [{position: 'left', axisLabel: options['vtitle']}];
+                }
                 state = options['state'] || 'lines';
                 return $.extend(options, options['states'][state]);
             }
