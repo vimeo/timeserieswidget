@@ -1,6 +1,7 @@
 // graphite.js
 
-function build_url(options) {
+function build_url(options, raw) {
+    raw = raw || false;
     var url = options.url + "?";
 
     // use random parameter to force image refresh
@@ -11,14 +12,21 @@ function build_url(options) {
             $.each(value, function (index, value) {
                 url += "&target=" + value;
             });
-        } else if (key === "targets") { // rickshaw
+        } else if (key === "targets") { // raw
             $.each(value, function (index, value) {
                     url += "&target=" + value.target;
             });
         } else if (value !== null && key !== "url") {
-            url += "&" + key + "=" + value;
+            if (key === 'fgcolor' && raw) {
+                // let's leave out these options, it's not needed, but looks cleaner.
+            } else {
+                url += "&" + key + "=" + value;
+           }
         }
     });
+    if(raw) {
+        url += '&format=json';
+    }
 
     url = url.replace(/\?&/, "?");
     return url;
@@ -186,7 +194,7 @@ function find_definition (target_graphite, options) {
             cache: false,
             dataType: 'jsonp',
             jsonp: 'jsonp',
-            url: build_url(options) + '&format=json',
+            url: build_url(options, true),
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
         }).done(drawFlot);
     };
@@ -296,7 +304,7 @@ function find_definition (target_graphite, options) {
             cache: false,
             dataType: 'jsonp',
             jsonp: 'jsonp',
-            url: build_url(options) + '&format=json',
+            url: build_url(options, true),
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
           }).done(drawRick);
     };
