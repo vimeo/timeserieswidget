@@ -10,17 +10,17 @@ function build_url(options, raw) {
     $.each(options, function (key, value) {
         if (key === "target") { // png
             $.each(value, function (index, value) {
-                url += "&target=" + value;
+                url += "&target=" + encodeURIComponent(value);
             });
         } else if (key === "targets") { // raw
             $.each(value, function (index, value) {
-                    url += "&target=" + value.target;
+                    url += "&target=" + encodeURIComponent(value.target);
             });
         } else if (value !== null && key !== "url") {
             if (key === 'fgcolor' && raw) {
                 // let's leave out these options, it's not needed, but looks cleaner.
             } else {
-                url += "&" + key + "=" + value;
+                url += "&" + key + "=" + encodeURIComponent(value);
            }
         }
     });
