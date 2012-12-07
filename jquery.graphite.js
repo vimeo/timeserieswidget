@@ -8,13 +8,13 @@ function build_url(options, raw) {
     options["_t"] = options["_t"] || Math.random();
 
     $.each(options, function (key, value) {
-        if (key === "target") { // png
+        if (key === "targets") {
             $.each(value, function (index, value) {
-                url += "&target=" + encodeURIComponent(value);
-            });
-        } else if (key === "targets") { // raw
-            $.each(value, function (index, value) {
-                    url += "&target=" + encodeURIComponent(value.target);
+                    if (raw) {
+                        url += "&target=" + encodeURIComponent(value.target);
+                    } else {
+                        url += "&target=alias(color(" +encodeURIComponent(value.target) + ",'" + value.color +"'),'" + value.name +"')";
+                    }
             });
         } else if (value !== null && key !== "url") {
             if (key === 'fgcolor' && raw) {
@@ -31,6 +31,17 @@ function build_url(options, raw) {
     url = url.replace(/\?&/, "?");
     return url;
 };
+
+function is_rgb_without_hash(str) {
+    return (/^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/i.test(str));
+}
+// convert a colorspec from graphite into something that flot/rickshaw likes
+function color_from_graphite(str) {
+    if (is_rgb_without_hash(str)) {
+        return '#' + str;
+    }
+    return str;
+}
 
 function find_definition (target_graphite, options) {
     var matching_i = undefined;
@@ -170,6 +181,9 @@ function find_definition (target_graphite, options) {
                 if('vtitle' in options) {
                     options['yaxes'] = [{position: 'left', axisLabel: options['vtitle']}];
                 }
+                for (i = 0; i < options['targets'].length; i++ ) {
+                    options['targets'][i]['color'] = color_from_graphite(options['targets'][i]['color']);
+                }
                 state = options['state'] || 'lines';
                 return $.extend(options, options['states'][state]);
             }
@@ -235,6 +249,9 @@ function find_definition (target_graphite, options) {
             }
             options['element'] = div;
             options['series'] = all_targets
+            for (i = 0; i < options['targets'].length; i++ ) {
+                options['targets'][i]['color'] = color_from_graphite(options['targets'][i]['color']);
+            }
             var graph = new Rickshaw.Graph(options);
             if(options['x_axis']) {
                 var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph } );

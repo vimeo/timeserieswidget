@@ -225,3 +225,25 @@ $("#graph").graphite({
 
 You should probably specify a target. All other settings are optional. All
 settings will be passed through to the graphite api.
+
+
+# Configuration
+retaining a familiar 'graphite function api'-feel, easy switching between backends,
+designing an API on top of flot/rickshaw tailored towards timeseries and making common features easily available,
+while still providing access to flot/rickshaw internals for deep customisation, is no easy task.
+But I think I've come up with a solution that's fairly elegant.  Here's how it works.
+
+* the general rule is: each option in the option dict corresponds with a graphite url parameter name
+* instead of `target=<foo>&target=<bar>(...)` we define a `targets` list option
+* in target definitions:
+  * don't use `alias()` or `color()`, we have alternatives (see below)
+  * don't use `colorList`, i didn't even look into how to port this feature to flot/rickshaw cause you can easily avoid it
+  * graphite supports color names like 'green' and hexadecimal RGB codes like '1088ef' (it doesn't allow a `#` prefix)
+  * flot generally uses names or CSS color specifications like "rgb(255, 100, 123)" or '#1088ef',
+    or an integer that specifies which of auto-generated colors to select, e.g. 0 will get color no. 0
+    it unofficially supports graphite-style color codes (with '#') but only in line mode, so we keep compat with graphite
+    in your config (no '#'), but automatically add the '#' when needed.  same for rickshaw which requires the '#'.
+
+* enabling certain interactivity features may set other options which may override specific customisations you did;
+  consult the code and grep for the feature if you want to know more.
+* as a general rule, put all the options that only apply to a specific backend at the bottom of the config

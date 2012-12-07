@@ -1,48 +1,44 @@
 <html>
-    <head>
-        <script src="../jquery.min.js"></script>
-        <script src="../jquery-ui.min.js"></script>
-        <script src="../jquery.graphite.js"></script>
-        <script src="../graphite_helpers.js"></script>
-        <script src="../rickshaw/vendor/d3.min.js"></script>
-        <script src="../rickshaw/vendor/d3.layout.min.js"></script>
-        <script src="../rickshaw/rickshaw.js"></script>
-        <script src="graph_defs_png.js"></script>
-        <script src="graph_defs_rickshaw.js"></script>
-        <script src="graph_defs_flot.js"></script>
-        <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
-        <script src="../flot/jquery.flot.js"></script>
-        <script src="../flot/jquery.flot.selection.js"></script>
-        <script src="../flot/jquery.flot.time.js"></script>
-        <script src="../flot/jquery.flot.stack.js"></script>
-        <script src="../jquery.flot.axislabels.js"></script>
-        <link type="text/css" rel="stylesheet" href="../graphitejs.css">
-    </head>
+    <head></head>
     <body>
-        <h2>Graphite PNG</h2>
-        <img id="graph_png_fancy"/>
-        <script language="javascript">
-            $("#graph_png_fancy").graphite(graph_png_fancy);
-        </script>
-        <h2>Flot</h2>
-
-        <div class="chart_container flot" id="chart_container_flot">
-            <div class="chart" id="chart_flot" height="300px" width="700px"></div>
-            <div class="legend" id="legend_flot"></div>
-            <form class="toggler" id="line_stack_form_flot"></form>
-        </div>
-        <script language="javascript">
-            $("#chart_flot").graphiteFlot(graph_flot_fancy_stacked, function(err) { console.log(err); });
-        </script>
-        <h2>Rickshaw</h2>
-        <div class="chart_container rickshaw" id="chart_container_rickshaw">
-            <div class="chart_y_axis" id="y_axis_rickshaw"></div>
-            <div class="chart" id="chart_rickshaw"></div>
-            <div class="legend" id="legend_rickshaw"></div>
-            <form class="toggler" id="line_stack_form_rickshaw"></form>
-        </div>
-        <script language="javascript">
-            $("#chart_rickshaw").graphiteRick(graph_rickshaw_fancy, function(err) { console.log(err); });
-        </script>
+        <ul>
+            <li><a href="#png_simple_line"       >PNG simple line</a></i>
+            <li><a href="#png_fancy_stacked"     >PNG fancy stacked</a></i>
+            <li><a href="#flot_simple_line"      >Flot simple line</a></i>
+            <li><a href="#flot_fancy_stacked"    >Flot fancy stacked</a></i>
+            <li><a href="#rickshaw_simple_line"  >Rickshaw simple line</a></i>
+            <li><a href="#rickshaw_fancy_stacked">Rickshaw fancy stacked</a></i>
+        </ul>
+        <table width="1650px">
+            <tr>
+                <td>
+                    <h2 id="png_simple_line">PNG simple line</h2>
+                    <iframe src="graph-png-simple-line.html" width='800px' height='380' style='height:380px;' frameborder='0'></iframe>
+                </td>
+                <td>
+                    <h2 id="png_fancy_stacked">PNG fancy stacked</h2>
+                    <iframe src="graph-png-fancy-stacked.html" width='800px' height='380' style='height:380px;' frameborder='0'></iframe>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2 id="flot_simple_line">Flot simple line</h2>
+                    <iframe src="graph-flot-simple-line.html" width='850px' height='380' style='height:380px;' frameborder='0'></iframe>
+                <td>
+                    <h2 id="flot_fancy_stacked">Flot fancy stacked</h2>
+                    <iframe src="graph-flot-fancy-stacked.html" width='850px' height='380' style='height:380px;' frameborder='0'></iframe>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h2 id="rickshaw_simple_line">Rickshaw simple line</h2>
+                    <iframe src="graph-rickshaw-simple-line.html" width='1000px' height='380' style='height:380px;' frameborder='0'></iframe>
+                </td>
+                <td>
+                    <h2 id="rickshaw_fancy_stacked">Rickshaw fancy stacked</h2>
+                    <iframe src="graph-rickshaw-fancy-stacked.html" width='1000px' height='380' style='height:380px;' frameborder='0'></iframe>
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
