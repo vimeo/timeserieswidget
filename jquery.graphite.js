@@ -269,6 +269,18 @@ function find_definition (target_graphite, options) {
                     graph: graph
                 } );
             }
+            var setRickshawOptions = function (options, graph) {
+                if ('state' in options && options['state'] == 'stacked') {
+                    graph.setRenderer('stack');
+                    graph.offset = 'zero';
+                }
+                else { // 'state' is lines
+                    graph.setRenderer('line');
+                    graph.offset = 'zero';
+                }
+                return graph;
+            }
+            graph = setRickshawOptions(options, graph);
             graph.render();
             if (options['legend']) {
                 var legend = new Rickshaw.Graph.Legend({
@@ -303,21 +315,14 @@ function find_definition (target_graphite, options) {
                     lines_checked = ' checked';
                     stack_checked = '';
                 }
-                form.innerHTML= '<input type="radio" name="offset" id="lines" value="lines"'+ lines_checked +'>' +
+                form.innerHTML= '<input type="radio" name="mode" id="lines" value="lines"'+ lines_checked +'>' +
                     '<label class="lines" for="lines">lines</label>' +
-                    '<br/><input type="radio" name="offset" id="stack" value="zero"' + stack_checked + '>' +
-                    '<label class="stack" for="stack">stack</label>';
+                    '<br/><input type="radio" name="mode" id="stacked" value="stacked"' + stack_checked + '>' +
+                    '<label class="stack" for="stacked">stacked</label>';
 
                 form.addEventListener('change', function(e) {
-                    var offsetMode = e.target.value;
-
-                    if (offsetMode == 'lines') {
-                        graph.setRenderer('line');
-                        graph.offset = 'zero';
-                    } else {
-                        graph.setRenderer('stack');
-                        graph.offset = offsetMode;
-                    }
+                    options['state'] = e.target.value;
+                    graph = setRickshawOptions(options, graph);
                     graph.render();
                 }, false);
             }

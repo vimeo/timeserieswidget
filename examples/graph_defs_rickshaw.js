@@ -16,6 +16,14 @@ graph_rickshaw_simple_line = {
     ],
     title: 'Memcache',
     vtitle: 'requests/second',
+    y_axis: 'y_axis_rickshaw',
+    x_axis: true,
+    legend: 'legend_rickshaw',
+    legend_toggle: true,
+    legend_reorder: true,
+    legend_highlight: true,
+    hoover_details: true,
+    line_stack_toggle: 'line_stack_form_rickshaw',
 };
 graph_rickshaw_fancy_stacked = {
     url: "http://<graphite hostname:port>/render/",
@@ -70,5 +78,6 @@ graph_rickshaw_fancy_stacked = {
     y_axis: 'y_axis_rickshaw',
     x_axis: true,
     title: "render time histogram",
-    vtitle: "rel. freq with scale adjustment per band"
+    vtitle: "rel. freq with scale adjustment per band",
+    state: 'stacked'
 };
