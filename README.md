@@ -86,7 +86,7 @@ NA = not available, WIP = work in progress
 <tr>
     <td>notes</td>
     <td>1999 called. they want their static images back.<br/>
-    you could actually implement these features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
+    you could actually implement interactive features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
     <td>flot seems to have a tad more features than rickshaw</td>
     <td>more "generic" (based on D3), all data is accessible in DOM and themeable with CSS</td>
 </tr>
