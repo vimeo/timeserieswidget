@@ -79,5 +79,6 @@ graph_rickshaw_fancy_stacked = {
     x_axis: true,
     title: "render time histogram",
     vtitle: "rel. freq with scale adjustment per band",
+    drawNullAsZero: false,
     state: 'stacked'
 };

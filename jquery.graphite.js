@@ -152,8 +152,14 @@ function find_definition (target_graphite, options) {
                 var target = find_definition(response[res_i], options);
                 target.label = target.name // flot wants 'label'
                 target.data = [];
-                for (var i in response[res_i].datapoints) {
-                    target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0] || 0 ];
+                if('drawNullAsZero' in options && options['drawNullAsZero']) {
+                    for (var i in response[res_i].datapoints) {
+                        target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0] || 0 ];
+                    }
+                } else {
+                    for (var i in response[res_i].datapoints) {
+                        target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0]];
+                    }
                 }
                 all_targets.push(target);
             }

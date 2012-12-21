@@ -66,8 +66,8 @@ graph_png_fancy_stacked = {
     ],
     title: "render time histogram (stacked graph)",
     vtitle: "rel. freq with scale adjustment per band",
+    drawNullAsZero: false,
     lineMode: "slope",
     areaMode: "stacked",
-    drawNullAsZero: "false",
     hideLegend: "false"
 };

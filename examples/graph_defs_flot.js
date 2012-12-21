@@ -63,6 +63,7 @@ graph_flot_fancy_stacked = {
     ],
     title: "render time histogram (stacked graph)",
     vtitle: "rel. freq with scale adjustment per band",
+    drawNullAsZero: false,
     line_stack_toggle: 'line_stack_form_flot',
     state: 'stacked',
     legend: { container: '#legend_flot', noColumns: 1 },
