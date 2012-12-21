@@ -172,9 +172,23 @@ function find_definition (target_graphite, options) {
             }
             options['states'] = $.extend(options['states'], states);
 
+            function suffixFormatter(val, axis) {
+                range = axis.max - axis.min;
+                lowest = Math.min (range,val);
+                if (lowest >= Math.pow(10,12))
+                    return (val / Math.pow(10,12)).toFixed(axis.tickDecimals) + " T";
+                if (lowest >= Math.pow(10,9))
+                    return (val / Math.pow(10,9)).toFixed(axis.tickDecimals) + " G";
+                if (lowest >= Math.pow(10,6))
+                    return (val / Math.pow(10,6)).toFixed(axis.tickDecimals) + " M";
+                if (lowest >= Math.pow(10,3))
+                    return (val / Math.pow(10,3)).toFixed(axis.tickDecimals) + " k";
+                return val.toFixed(axis.tickDecimals);
+            }
+
             var buildFlotOptions = function(options) {
                 options['xaxis'] = { color: options['fgcolor'], mode: 'time'};
-                options['yaxis'] = { color: options['fgcolor']};
+                options['yaxis'] = { color: options['fgcolor'], tickFormatter: suffixFormatter};
                 if('title' in options) {
                     options['xaxes'] = [{axisLabel: options['title']}];
                 }
