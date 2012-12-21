@@ -172,7 +172,7 @@ function find_definition (target_graphite, options) {
             }
             options['states'] = $.extend(options['states'], states);
 
-            function suffixFormatter(val, axis) {
+            function suffixFormatterSI(val, axis) {
                 range = axis.max - axis.min;
                 lowest = Math.min (range,val);
                 if (lowest >= Math.pow(10,12))
@@ -185,10 +185,30 @@ function find_definition (target_graphite, options) {
                     return (val / Math.pow(10,3)).toFixed(axis.tickDecimals) + " k";
                 return val.toFixed(axis.tickDecimals);
             }
+            function suffixFormatterBinary(val, axis) {
+                range = axis.max - axis.min;
+                lowest = Math.min (range,val);
+                if (lowest >= Math.pow(2,40))
+                    return (val / Math.pow(2,40)).toFixed(axis.tickDecimals) + " Ti";
+                if (lowest >= Math.pow(2,30))
+                    return (val / Math.pow(2,30)).toFixed(axis.tickDecimals) + " Gi";
+                if (lowest >= Math.pow(2,20))
+                    return (val / Math.pow(2,20)).toFixed(axis.tickDecimals) + " Mi";
+                if (lowest >= Math.pow(2,10))
+                    return (val / Math.pow(2,10)).toFixed(axis.tickDecimals) + " Ki";
+                return val.toFixed(axis.tickDecimals);
+            }
 
             var buildFlotOptions = function(options) {
                 options['xaxis'] = { color: options['fgcolor'], mode: 'time'};
-                options['yaxis'] = { color: options['fgcolor'], tickFormatter: suffixFormatter};
+                options['yaxis'] = { color: options['fgcolor'], tickFormatter: suffixFormatterSI};
+                if('suffixes' in options) {
+                    if(options['suffixes'] == 'binary') {
+                        options['yaxis']['tickFormatter'] = suffixFormatterBinary;
+                    } else if(!options['suffixes']) {
+                        delete options['yaxis']['tickFormatter'];
+                    }
+                }
                 if('title' in options) {
                     options['xaxes'] = [{axisLabel: options['title']}];
                 }

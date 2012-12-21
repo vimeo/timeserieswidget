@@ -158,6 +158,11 @@ up in the source code.
 * zoom, panning
 * annotations
 
+## Optional keys for flot/rickshaw
+
+* 'suffixes': false, 'binary' or 'si' (defaults to 'si')
+ automatically show large numbers using a prefix.  like graphite does, but configurable
+
 ## Graphite PNG's
 ### How it works
 
