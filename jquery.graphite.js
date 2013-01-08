@@ -153,8 +153,11 @@ function find_definition (target_graphite, options) {
         $div.height(options.height);
         $div.width(options.width);
         var drawFlot = function(resp_graphite, resp_anthracite) {
-            resp_graphite = resp_graphite[0];
-            var events = resp_anthracite[0].events;
+            var events = [];
+            if('anthracite_url' in options){
+                resp_graphite = resp_graphite[0];
+                events = resp_anthracite[0].events;
+            }
             var all_targets = [];
             if(resp_graphite.length == 0 ) {
                 console.warn("no data in graphite response");
@@ -281,6 +284,7 @@ function find_definition (target_graphite, options) {
                 }, false);
             }
         }
+        if('anthracite_url' in options){
         $.when(
         $.ajax({
             accepts: {text: 'application/json'},
@@ -298,6 +302,16 @@ function find_definition (target_graphite, options) {
             url: build_anthracite_url(options, true),
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
         })).done(drawFlot);
+        } else {
+            $.ajax({
+                accepts: {text: 'application/json'},
+                cache: false,
+                dataType: 'jsonp',
+                jsonp: 'jsonp',
+                url: build_graphite_url(options, true),
+                error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+            }).done(drawFlot);
+        }
     };
 
     $.fn.graphiteRick.render = function(div, options, on_error) {
@@ -317,8 +331,6 @@ function find_definition (target_graphite, options) {
             // in some unlikely cases this is not correct (there might be overlap between different target_options with globs)
             // but in that case I don't see why taking the settings of any of the possible originating target_options wouldn't be fine.
             var all_targets = [];
-            resp_graphite = resp_graphite[0];
-            var events = resp_anthracite[0].events;
             if(resp_graphite.length == 0 ) {
                 console.warn("no data in graphite response");
             }
