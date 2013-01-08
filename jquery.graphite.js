@@ -184,7 +184,7 @@ function find_definition (target_graphite, options) {
                     'series': {'stack': null, 'lines': { 'show': true, 'lineWidth': 0.6, 'fill': false }}
                 }
             };
-            if(! 'states' in options) {
+            if(!('states' in options)) {
                 options['states'] = {};
             }
             options['states'] = $.extend(options['states'], states);
