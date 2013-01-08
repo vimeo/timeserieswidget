@@ -1,8 +1,8 @@
 // graphite.js
 
-function build_url(options, raw) {
+function build_graphite_url(options, raw) {
     raw = raw || false;
-    var url = options.url + "?";
+    var url = options.graphite_url + "?";
 
     // use random parameter to force image refresh
     options["_t"] = options["_t"] || Math.random();
@@ -31,6 +31,11 @@ function build_url(options, raw) {
     url = url.replace(/\?&/, "?");
     return url;
 };
+
+function build_anthracite_url(options) {
+    return options.anthracite_url + '/jsonp';
+}
+
 
 function is_rgb_without_hash(str) {
     return (/^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/i.test(str));
@@ -72,6 +77,10 @@ function find_definition (target_graphite, options) {
     var default_graphite_options = {
         'fgcolor' : '#ffffff'
     }
+    var default_graphitejs_options = {
+        'events_color': '#ccff66',
+        'events_text_color': '#5C991F'
+    }
 
     $.fn.graphite = function (options) {
         if (options === "update") {
@@ -93,7 +102,7 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphite.render = function($img, options) {
-        $img.attr("src", build_url(options));
+        $img.attr("src", build_graphite_url(options));
         $img.attr("height", options.height);
         $img.attr("width", options.width);
     };
@@ -119,7 +128,7 @@ function find_definition (target_graphite, options) {
     // plot ($(..), [d], ..)
     $.fn.graphiteRick = function (options, on_error) {
         options = options || {};
-        var settings = $.extend({}, default_graphite_options, $.fn.graphite.defaults, options);
+        var settings = $.extend({}, default_graphite_options, default_graphitejs_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
@@ -130,7 +139,7 @@ function find_definition (target_graphite, options) {
 
     $.fn.graphiteFlot = function (options, on_error) {
         options = options || {};
-        var settings = $.extend({}, default_graphite_options, $.fn.graphite.defaults, options);
+        var settings = $.extend({}, default_graphite_options, default_graphitejs_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
@@ -143,22 +152,24 @@ function find_definition (target_graphite, options) {
         $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
-        var drawFlot = function(response) {
+        var drawFlot = function(resp_graphite, resp_anthracite) {
+            resp_graphite = resp_graphite[0];
+            var events = resp_anthracite[0].events;
             var all_targets = [];
-            if(response.length == 0 ) {
-                console.warn("no data in response");
+            if(resp_graphite.length == 0 ) {
+                console.warn("no data in graphite response");
             }
-            for (var res_i = 0; res_i < response.length; res_i++) {
-                var target = find_definition(response[res_i], options);
+            for (var res_i = 0; res_i < resp_graphite.length; res_i++) {
+                var target = find_definition(resp_graphite[res_i], options);
                 target.label = target.name // flot wants 'label'
                 target.data = [];
                 if('drawNullAsZero' in options && options['drawNullAsZero']) {
-                    for (var i in response[res_i].datapoints) {
-                        target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0] || 0 ];
+                    for (var i in resp_graphite[res_i].datapoints) {
+                        target.data[i] = [resp_graphite[res_i].datapoints[i][1] * 1000, resp_graphite[res_i].datapoints[i][0] || 0 ];
                     }
                 } else {
-                    for (var i in response[res_i].datapoints) {
-                        target.data[i] = [response[res_i].datapoints[i][1] * 1000, response[res_i].datapoints[i][0]];
+                    for (var i in resp_graphite[res_i].datapoints) {
+                        target.data[i] = [resp_graphite[res_i].datapoints[i][1] * 1000, resp_graphite[res_i].datapoints[i][0]];
                     }
                 }
                 all_targets.push(target);
@@ -224,10 +235,31 @@ function find_definition (target_graphite, options) {
                 for (i = 0; i < options['targets'].length; i++ ) {
                     options['targets'][i]['color'] = color_from_graphite(options['targets'][i]['color']);
                 }
+                if(!('grid' in options)) {
+                    options['grid'] = {};
+                }
+                if(!('markings' in options['grid'])) {
+                    options['grid']['markings'] = [];
+                }
+                for (var i = 0; i < events.length; i++) {
+                    x = events[i].time * 1000;
+                    options['grid']['markings'].push({ color: options['events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
+                }
                 state = options['state'] || 'lines';
                 return $.extend(options, options['states'][state]);
             }
-            $.plot(div, all_targets, buildFlotOptions(options));
+            var plot = $.plot(div, all_targets, buildFlotOptions(options));
+            // add labels
+            var o;
+            for (var i = 0; i < events.length; i++) {
+                o = plot.pointOffset({ x: events[i].time * 1000, y: 0});
+                msg = '<div style="position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 10 ) + 'px;';
+                msg += 'color:' + options['events_text_color'] + ';font-size:smaller">';
+                msg += '<b>' + events[i].type + '</b></br>';
+                msg += events[i].desc
+                msg += '</div>';
+                $div.append(msg);
+            }
             if (options['line_stack_toggle']) {
                 var form = document.getElementById(options['line_stack_toggle']);
                 if(options['state'] == 'stacked') {
@@ -249,22 +281,31 @@ function find_definition (target_graphite, options) {
                 }, false);
             }
         }
+        $.when(
         $.ajax({
             accepts: {text: 'application/json'},
             cache: false,
             dataType: 'jsonp',
             jsonp: 'jsonp',
-            url: build_url(options, true),
+            url: build_graphite_url(options, true),
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
-        }).done(drawFlot);
+        }),
+        $.ajax({
+            accepts: {text: 'application/json'},
+            cache: false,
+            dataType: 'jsonp',
+            jsonp: 'jsonp',
+            url: build_anthracite_url(options, true),
+            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+        })).done(drawFlot);
     };
 
     $.fn.graphiteRick.render = function(div, options, on_error) {
         $div = $(div);
         $div.attr("height", options.height);
         $div.attr("width", options.width);
-        var drawRick = function(response) {
-            // note that response.length can be != options.targets.length.  let's call:
+        var drawRick = function(resp_graphite) {
+            // note that resp_graphite.length can be != options.targets.length.  let's call:
             // * target_graphite a targetstring as returned by graphite
             // * target_option a targetstring configuration
             // if a target_option contains * graphite will return all matches separately unless you use something to aggregate like sumSeries()
@@ -276,14 +317,16 @@ function find_definition (target_graphite, options) {
             // in some unlikely cases this is not correct (there might be overlap between different target_options with globs)
             // but in that case I don't see why taking the settings of any of the possible originating target_options wouldn't be fine.
             var all_targets = [];
-            if(response.length == 0 ) {
-                console.warn("no data in response");
+            resp_graphite = resp_graphite[0];
+            var events = resp_anthracite[0].events;
+            if(resp_graphite.length == 0 ) {
+                console.warn("no data in graphite response");
             }
-            for (var res_i = 0; res_i < response.length; res_i++) {
-                var target = find_definition(response[res_i], options);
+            for (var res_i = 0; res_i < resp_graphite.length; res_i++) {
+                var target = find_definition(resp_graphite[res_i], options);
                 target.data = [];
-                for (var i in response[res_i].datapoints) {
-                    target.data[i] = { x: response[res_i].datapoints[i][1], y: response[res_i].datapoints[i][0] || 0 };
+                for (var i in resp_graphite[res_i].datapoints) {
+                    target.data[i] = { x: resp_graphite[res_i].datapoints[i][1], y: resp_graphite[res_i].datapoints[i][0] || 0 };
                 }
                 all_targets.push(target);
             }
@@ -372,7 +415,7 @@ function find_definition (target_graphite, options) {
             cache: false,
             dataType: 'jsonp',
             jsonp: 'jsonp',
-            url: build_url(options, true),
+            url: build_graphite_url(options, true),
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
           }).done(drawRick);
     };
@@ -385,7 +428,7 @@ function find_definition (target_graphite, options) {
         from: "-1hour",
         height: "300",
         until: "now",
-        url: "/render/",
+        graphite_url: "/render/",
         width: "940"
     };
 

@@ -46,9 +46,9 @@ NA = not available, WIP = work in progress
     <td>Y</td>
 </tr>
 <tr>
-    <td>events with annotations</td>
+    <td>events with annotations (using anthracite)</td>
     <td>NA</td>
-    <td>WIP</td>
+    <td>Y</td>
     <td>WIP</td>
 </tr>
 <tr>
@@ -156,7 +156,6 @@ up in the source code.
 
 * timezone
 * zoom, panning
-* annotations
 
 ## Optional keys for flot/rickshaw
 
