@@ -94,8 +94,8 @@ NA = not available, WIP = work in progress
 
 **any web code that can generate graphite urls can use this library with minimal transition work**
 
-![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshot-compare.png)
-
+![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshots/flot-annotated-event.png)
+![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshots/compare-stacked.png)
 ## Notes for client-side graph rendering / troubleshooting
 
 ### Configuration of graphite server / If you don't seem to get any actual data
