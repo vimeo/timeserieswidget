@@ -253,7 +253,7 @@ function find_definition (target_graphite, options) {
             var o;
             for (var i = 0; i < events.length; i++) {
                 o = plot.pointOffset({ x: events[i].time * 1000, y: 0});
-                msg = '<div style="position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 10 ) + 'px;';
+                msg = '<div style="position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 35 ) + 'px;';
                 msg += 'color:' + options['events_text_color'] + ';font-size:smaller">';
                 msg += '<b>' + events[i].type + '</b></br>';
                 msg += events[i].desc
