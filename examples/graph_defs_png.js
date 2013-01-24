@@ -1,5 +1,5 @@
 graph_png_simple_line = {
-    url: "http://<graphite hostname:port>/render/",
+    graphite_url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",
@@ -21,7 +21,7 @@ graph_png_simple_line = {
 };
 
 graph_png_fancy_stacked = {
-    url: "http://<graphite hostname:port>/render/",
+    graphite_url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",

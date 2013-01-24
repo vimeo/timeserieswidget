@@ -1,5 +1,5 @@
 graph_rickshaw_simple_line = {
-    url: "http://<graphite hostname:port>/render/",
+    graphite_url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",
@@ -26,7 +26,7 @@ graph_rickshaw_simple_line = {
     line_stack_toggle: 'line_stack_form_rickshaw',
 };
 graph_rickshaw_fancy_stacked = {
-    url: "http://<graphite hostname:port>/render/",
+    graphite_url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",

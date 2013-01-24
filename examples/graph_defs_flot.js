@@ -1,5 +1,5 @@
 graph_flot_simple_line = {
-    url: "http://<graphite hostname:port>/render/",
+    graphite_url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",
@@ -18,7 +18,7 @@ graph_flot_simple_line = {
     vtitle: 'requests/second',
 };
 graph_flot_fancy_stacked = {
-    url: "http://<graphite hostname:port>/render/",
+    graphite_url: "http://<graphite hostname:port>/render/",
     from: "-24hours",
     until: "now",
     height: "300",
