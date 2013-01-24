@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <script src="../jquery.min.js"></script>
+        <script src="../jquery-ui.min.js"></script>
+        <script src="../jquery.graphite.js"></script>
+        <script src="../graphite_helpers.js"></script>
+        <script src="../rickshaw/vendor/d3.min.js"></script>
+        <script src="../rickshaw/vendor/d3.layout.min.js"></script>
+        <script src="../rickshaw/rickshaw.js"></script>
+        <script src="graph_defs_rickshaw.js"></script>
+        <link type="text/css" rel="stylesheet" href="../rickshaw/rickshaw.css">
+        <link type="text/css" rel="stylesheet" href="../graphitejs.css">
+    </head>
+    <body>
+        <div class="chart_container rickshaw" id="chart_container_rickshaw">
+            <div class="chart_y_axis" id="y_axis_rickshaw"></div>
+            <div class="chart" id="chart_rickshaw"></div>
+            <div class="legend" id="legend_rickshaw"></div>
+            <form class="toggler" id="line_stack_form_rickshaw"></form>
+        </div>
+        <script language="javascript">
+            $("#chart_rickshaw").graphiteRick(graph_rickshaw_simple_line, function(err) { console.log(err); });
+        </script>
+    </body>
+</html>
