@@ -18,7 +18,7 @@ Goals:
 code to render client-side graphs, minimizing redundant work and combining efforts.
 
 Feature comparison table.
-NA = not available, WIP = work in progress
+NA = not available (can't be done to my knowledge), WIP = work in progress (should be possible)
 
 <table>
 <tr>
