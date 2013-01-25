@@ -84,6 +84,12 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>Y</td>
 </tr>
 <tr>
+    <td>auto smoothing dense graphs based on datapoints/pixel</td>
+    <td>NA</td>
+    <td>NA</td>
+    <td>WIP</td>
+</tr>
+<tr>
     <td>notes</td>
     <td>1999 called. they want their static images back.<br/>
     you could actually implement interactive features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
