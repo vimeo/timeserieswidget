@@ -1,6 +1,6 @@
-## graphite.js
+## TimeSeriesWidget
 
-Plugin to easily make graphs and update them on the fly using
+Plugin to easily make time series graphs and update them on the fly using
 [Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html) on the background,
 allowing you to easily add:
 
@@ -11,7 +11,7 @@ allowing you to easily add:
 * PNG's rendered by Graphite
 
 Goals:
-* easy to use, elegant but powerful api.
+* easy to use, elegant but powerful api, aimed to cover all your graphite/time series graphing needs.
 * only abstract where it makes sense.  Graphite, Flot, and Rickshaw api's are awesome and powerfull, expose them
 * aim for some consistency in configuration across backends (to the extent possible and sane)
 * provide all interactive features you would expect; so that all graphite dashboards can rely on the same
@@ -74,7 +74,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>NA</td>
     <td>WIP (<a href="https://github.com/flot/flot/pull/848">flot pull 848</a>,
              <a href="https://github.com/flot/flot/issues/869">flot pull 869</a>,
-             <a href="https://github.com/Dieterbe/graphitejs/tree/flot-legend-toggle">branch flot-legend-toggle</a>)</td>
+             <a href="https://github.com/Dieterbe/timeserieswidget/tree/flot-legend-toggle">branch flot-legend-toggle</a>)</td>
     <td>Y</td>
 </tr>
 <tr>
@@ -100,8 +100,8 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
 
 **any web code that can generate graphite urls can use this library with minimal transition work**
 
-![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshots/flot-annotated-event.png)
-![Screenshot](https://raw.github.com/Dieterbe/graphitejs/master/screenshots/compare-stacked.png)
+![Screenshot](https://raw.github.com/Dieterbe/timeserieswidget/master/screenshots/flot-annotated-event.png)
+![Screenshot](https://raw.github.com/Dieterbe/timeserieswidget/master/screenshots/compare-stacked.png)
 ## Notes for client-side graph rendering / troubleshooting
 
 ### Configuration of graphite server / If you don't seem to get any actual data

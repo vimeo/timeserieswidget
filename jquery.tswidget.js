@@ -77,7 +77,7 @@ function find_definition (target_graphite, options) {
     var default_graphite_options = {
         'fgcolor' : '#ffffff'
     }
-    var default_graphitejs_options = {
+    var default_tswidget_options = {
         'events_color': '#ccff66',
         'events_text_color': '#5C991F'
     }
@@ -128,7 +128,7 @@ function find_definition (target_graphite, options) {
     // plot ($(..), [d], ..)
     $.fn.graphiteRick = function (options, on_error) {
         options = options || {};
-        var settings = $.extend({}, default_graphite_options, default_graphitejs_options, $.fn.graphite.defaults, options);
+        var settings = $.extend({}, default_graphite_options, default_tswidget_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
@@ -139,7 +139,7 @@ function find_definition (target_graphite, options) {
 
     $.fn.graphiteFlot = function (options, on_error) {
         options = options || {};
-        var settings = $.extend({}, default_graphite_options, default_graphitejs_options, $.fn.graphite.defaults, options);
+        var settings = $.extend({}, default_graphite_options, default_tswidget_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
             $this = $(this);
