@@ -138,6 +138,10 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphiteFlot = function (options, on_error) {
+        if ('zoneFileBasePath' in options) {
+            timezoneJS.timezone.zoneFileBasePath = options['zoneFileBasePath'];
+            timezoneJS.timezone.init();
+        }
         options = options || {};
         var settings = $.extend({}, default_graphite_options, default_tswidget_options, $.fn.graphite.defaults, options);
 
@@ -221,6 +225,9 @@ function find_definition (target_graphite, options) {
 
             var buildFlotOptions = function(options) {
                 options['xaxis'] = { color: options['fgcolor'], mode: 'time'};
+                if ('tz' in options) {
+                    options['xaxis']['timezone'] = options['tz'];
+                }
                 options['yaxis'] = { color: options['fgcolor'], tickFormatter: suffixFormatterSI};
                 if('suffixes' in options) {
                     if(options['suffixes'] == 'binary') {

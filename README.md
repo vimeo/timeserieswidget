@@ -127,6 +127,12 @@ You'll probably notice that it looks slightly different from what you configured
 ## Flot client-side canvas graphs
 
 see examples
+note: for timezone support, include timezone-js/src/date.js,
+Set the 'zoneFileBasePath' option to the url path needed to reach the included tz folder,
+and of course set the 'tz' parameter to your timezone.
+Note if you load files straight from disk (such as the examples), you might see errors like
+"XMLHttpRequest cannot load file://(...)/timeserieswidget/tz/northamerica. Origin null is not allowed by Access-Control-Allow-Origin.".
+This is a CORS restriction, see http://stackoverflow.com/questions/3595515/xmlhttprequest-error-origin-null-is-not-allowed-by-access-control-allow-origin
 
 
 ## Rickshaw client-side svg graphs
