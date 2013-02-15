@@ -4,10 +4,28 @@ function build_graphite_url(options, raw) {
     raw = raw || false;
     var url = options.graphite_url + "?";
 
+    internal_options = ['_t'];
+    graphite_options = ['target', 'targets', 'from', 'until', 'rawData', 'format'];
+    graphite_png_options = ['width', 'height', 'template', 'margin', 'bgcolor',
+                         'fgcolor', 'fontName', 'fontSize', 'fontBold', 'fontItalic',
+                         'yMin', 'yMax', 'colorList', 'title', 'vtitle', 'lineMode',
+                         'lineWith', 'hideLegend', 'hideAxes', 'hideGrid', 'minXstep',
+                         'majorGridlineColor', 'minorGridLineColor', 'minorY',
+                         'thickness', 'min', 'max', 'tz'];
+
     // use random parameter to force image refresh
     options["_t"] = options["_t"] || Math.random();
 
     $.each(options, function (key, value) {
+        if(raw) {
+            if ($.inArray(key, graphite_options) == -1) {
+                return;
+            }
+        } else {
+            if ($.inArray(key, graphite_options) == -1 && $.inArray(key, graphite_png_options) == -1) {
+                return;
+            }
+        }
         if (key === "targets") {
             $.each(value, function (index, value) {
                     if (raw) {
@@ -16,12 +34,8 @@ function build_graphite_url(options, raw) {
                         url += "&target=alias(color(" +encodeURIComponent(value.target) + ",'" + value.color +"'),'" + value.name +"')";
                     }
             });
-        } else if (value !== null && key !== "url") {
-            if (key === 'fgcolor' && raw) {
-                // let's leave out these options, it's not needed, but looks cleaner.
-            } else {
-                url += "&" + key + "=" + encodeURIComponent(value);
-           }
+        } else if (value !== null) {
+            url += "&" + key + "=" + encodeURIComponent(value);
         }
     });
     if(raw) {
