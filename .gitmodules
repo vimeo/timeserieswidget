@@ -6,4 +6,4 @@
 	url = git://github.com/flot/flot.git
 [submodule "timezone-js"]
 	path = timezone-js
-	url = git@github.com:mde/timezone-js.git
+	url = git://github.com/mde/timezone-js.git
