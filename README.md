@@ -102,6 +102,13 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
 
 ![Screenshot](https://raw.github.com/Dieterbe/timeserieswidget/master/screenshots/flot-annotated-event.png)
 ![Screenshot](https://raw.github.com/Dieterbe/timeserieswidget/master/screenshots/compare-stacked.png)
+
+## Installation
+
+ * git clone into directory that will be available over http
+ * git submodule update --init
+ * include the needed css/js depending on your needs; see example files
+
 ## Notes for client-side graph rendering / troubleshooting
 
 ### Configuration of graphite server / If you don't seem to get any actual data
