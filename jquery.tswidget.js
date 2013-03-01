@@ -1,8 +1,14 @@
 // graphite.js
 
+// return a list of urls from the requested parameters
+// why N urls? because sometimes urls would become too long (with many targets)
+// it's up to the caller to deal with this.
 function build_graphite_url(options, raw) {
     raw = raw || false;
+    var limit = 2000;  // http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
     var url = options.graphite_url + "?";
+    var url_target = '';  // will contain the part of a url with target args
+    var target_parts = []; // will contain one or more of the above, depending on limit
 
     internal_options = ['_t'];
     graphite_options = ['target', 'targets', 'from', 'until', 'rawData', 'format'];
@@ -29,21 +35,31 @@ function build_graphite_url(options, raw) {
         if (key === "targets") {
             $.each(value, function (index, value) {
                     if (raw) {
-                        url += "&target=" + encodeURIComponent(value.target);
+                        new_part = "&target=" + encodeURIComponent(value.target);
                     } else {
-                        url += "&target=alias(color(" +encodeURIComponent(value.target) + ",'" + value.color +"'),'" + value.name +"')";
+                        new_part = "&target=alias(color(" +encodeURIComponent(value.target) + ",'" + value.color +"'),'" + value.name +"')";
                     }
+                    // note that this doesn't account for non-target args that will get added to url later, but this is good enough.
+                    if (url.length + url_target.length + new_part.length > limit) {
+                        target_parts.push(url_target);
+                        url_target = "";
+                    }
+                    url_target += new_part;
             });
         } else if (value !== null) {
+            // key can be 'target' here, so the 'targets' option doesn't have to be set (see above)
+            // so url_target can remain empty sometimes, which is fine. though using 'targets' is
+            // probably the better way.
             url += "&" + key + "=" + encodeURIComponent(value);
         }
     });
-    if(raw) {
-        url += '&format=json';
-    }
-
-    url = url.replace(/\?&/, "?");
-    return url;
+    target_parts.push(url_target);
+    return $.map(target_parts, function(target_part) {
+        if(raw) {
+            target_part += '&format=json';
+        }
+        return (url + target_part).replace(/\?&/, "?");
+    });
 };
 
 function build_anthracite_url(options) {
@@ -116,7 +132,7 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphite.render = function($img, options) {
-        $img.attr("src", build_graphite_url(options));
+        $img.attr("src", build_graphite_url(options)[0]); // TODO: ideally we would actually show multiple images
         $img.attr("height", options.height);
         $img.attr("width", options.width);
     };
@@ -170,31 +186,27 @@ function find_definition (target_graphite, options) {
         $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
-        var drawFlot = function(resp_graphite, resp_anthracite) {
-            var events = [];
-            if('anthracite_url' in options){
-                resp_graphite = resp_graphite[0];
-                events = resp_anthracite[0].events;
-            }
-            var all_targets = [];
-            if(resp_graphite.length == 0 ) {
-                console.warn("no data in graphite response");
-            }
-            for (var res_i = 0; res_i < resp_graphite.length; res_i++) {
-                var target = find_definition(resp_graphite[res_i], options);
+        var events = [];
+        var all_targets = [];
+        var add_targets = function(response_data) {
+            for (var res_i = 0; res_i < response_data.length; res_i++) {
+                var target = find_definition(response_data[res_i], options);
                 target.label = target.name // flot wants 'label'
                 target.data = [];
                 if('drawNullAsZero' in options && options['drawNullAsZero']) {
-                    for (var i in resp_graphite[res_i].datapoints) {
-                        target.data[i] = [resp_graphite[res_i].datapoints[i][1] * 1000, resp_graphite[res_i].datapoints[i][0] || 0 ];
+                    for (var i in response_data[res_i].datapoints) {
+                        target.data[i] = [response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0] || 0 ];
                     }
                 } else {
-                    for (var i in resp_graphite[res_i].datapoints) {
-                        target.data[i] = [resp_graphite[res_i].datapoints[i][1] * 1000, resp_graphite[res_i].datapoints[i][0]];
+                    for (var i in response_data[res_i].datapoints) {
+                        target.data[i] = [response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0]];
                     }
                 }
                 all_targets.push(target);
             }
+        }
+
+        var drawFlot = function() {
             // default config state modifiers (you can override them in your config objects)
             var states = {
                 'stacked': {
@@ -305,34 +317,35 @@ function find_definition (target_graphite, options) {
                 }, false);
             }
         }
-        if('anthracite_url' in options){
-        $.when(
-        $.ajax({
-            accepts: {text: 'application/json'},
-            cache: false,
-            dataType: 'jsonp',
-            jsonp: 'jsonp',
-            url: build_graphite_url(options, true),
-            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
-        }),
-        $.ajax({
-            accepts: {text: 'application/json'},
-            cache: false,
-            dataType: 'jsonp',
-            jsonp: 'jsonp',
-            url: build_anthracite_url(options, true),
-            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
-        })).done(drawFlot);
-        } else {
-            $.ajax({
+        urls = build_graphite_url(options, true);
+        var requests = $.map(urls, function(url) {
+            return $.ajax({
                 accepts: {text: 'application/json'},
                 cache: false,
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
-                url: build_graphite_url(options, true),
+                url: url,
+                success: function(data, textStatus, jqXHR ) {
+                    if(data.length == 0 ) {
+                        console.warn("no data in graphite response");
+                    }
+                    add_targets(data);
+                },
                 error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
-            }).done(drawFlot);
+            });
+        });
+        if('anthracite_url' in options){
+            requests.push($.ajax({
+                accepts: {text: 'application/json'},
+                cache: false,
+                dataType: 'jsonp',
+                jsonp: 'jsonp',
+                url: build_anthracite_url(options, true),
+                success: function(data, textStatus, jqXHR ) { events = data.events },
+                error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+            }));
         }
+        $.when.apply($, requests ).done(drawFlot);
     };
 
     $.fn.graphiteRick.render = function(div, options, on_error) {
@@ -448,7 +461,7 @@ function find_definition (target_graphite, options) {
             cache: false,
             dataType: 'jsonp',
             jsonp: 'jsonp',
-            url: build_graphite_url(options, true),
+            url: build_graphite_url(options, true)[0], // TODO: support for multiple urls, like flot has
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
           }).done(drawRick);
     };
