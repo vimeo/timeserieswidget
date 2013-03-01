@@ -1,4 +1,9 @@
-// graphite.js
+function strip_ending_slash(str) {
+    if(str.substr(-1) == '/') {
+        return str.substr(0, str.length - 1);
+    }
+    return str;
+}
 
 // return a list of urls from the requested parameters
 // why N urls? because sometimes urls would become too long (with many targets)
@@ -63,7 +68,7 @@ function build_graphite_url(options, raw) {
 };
 
 function build_anthracite_url(options) {
-    return options.anthracite_url + '/jsonp';
+    return strip_ending_slash(options.anthracite_url) + '/jsonp';
 }
 
 
