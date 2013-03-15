@@ -37,7 +37,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>speed</td>
     <td>quite fast</td>
     <td>quite fast.  interactive features near-realtime</td>
-    <td>becomes slow with many datapoints and/or multiple graphs</td>
+    <td>slow with many datapoints and/or multiple graphs (needs better <a href="https://github.com/graphite-project/graphite-web/issues/153">graphite consolidation</a>)</td>
 </tr>
 <tr>
     <td>hoover over datapoints/graph -> popup with exact data</td>
@@ -93,7 +93,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>notes</td>
     <td>1999 called. they want their static images back.<br/>
     you could actually implement interactive features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
-    <td>flot seems to have a tad more features than rickshaw</td>
+    <td></td>
     <td>more "generic" (based on D3), all data is accessible in DOM and themeable with CSS</td>
 </tr>
 </table>
@@ -120,15 +120,19 @@ For apache2 this works:
     Header set Access-Control-Allow-Methods "GET, OPTIONS"
     Header set Access-Control-Allow-Headers "origin, authorization, accept"
 
-### The code needs to be able to map targets returned from graphite back to your configuration, so:
+### The code needs to be able to map targets returned from graphite back to your configuration...
+
+and when graphite returns the json data, the <a href="https://github.com/graphite-project/graphite-web/issues/248">target string can be rewritten</a>: functions can be reordered, function aliases replaced by the native functions, and integers shown a bit differently
+(often with an added `.0`).  This results in timeseries javascript console errors like `internal error: could not figure out which target_option target_graphite '<a target returned from graphite>' comes from`.
+
+The best solution is refactoring the graphite functions' `pathExpression` stuff, but that's no easy feat.
+For the time being, here are some tips to alleviate most of the problems.
 
 * if you have `scale()`, `movingAverage()` and potentially a few more in your targets, be wary of https://github.com/graphite-project/graphite-web/issues/103
   and adjust your scales if needed to counter graphite's rewriting of arguments.
+* if you have `sum()` calls with multiple arguments, be wary that graphite might <a href="https://github.com/graphite-project/graphite-web/pull/135">change their order</a>
 * don't use function aliases, i.e. use `sumSeries()`, not `sum()`
 
-You need to check this if you see an error like
-`internal error: could not figure out which target_option target_graphite '<a target returned from graphite>' comes from`.
-You'll probably notice that it looks slightly different from what you configured, and graphite changed it a bit.
 
 
 ## Flot client-side canvas graphs
