@@ -233,14 +233,14 @@ $.fn.graphite.update($("#graph"), {from: "-3days", lineWidth: "2"});
 Five. Setting a custom api url--the default is "/render/":
 
 ```js
-$.fn.graphite.defaults.url = "http://myserver/render/"
+$.fn.graphite.defaults.graphite_url = "http://myserver/render/"
 ```
 
 or
 
 ```js
 $("#graph").graphite({
-    url: "http://myserver/render/"
+    graphite_url: "http://myserver/render/"
 });
 ```
 
