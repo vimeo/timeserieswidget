@@ -40,7 +40,14 @@ function build_graphite_url(options, raw) {
         if (key === "targets") {
             $.each(value, function (index, value) {
                     if (raw) {
-                        new_part = "&target=" + encodeURIComponent(value.target);
+                        // it's normally pointless to use alias() in raw mode, because we apply an alias (name) ourself
+                        // in the client rendering step.  we just need graphite to return the target.
+                        // but graphite sometimes alters the name of the target in the returned data
+                        // (https://github.com/graphite-project/graphite-web/issues/248)
+                        // so we need a good string identifier and set it using alias() (which graphite will honor)
+                        // so that we recognize the returned output. simplest is just to include the target spec again
+                        // though this duplicates a lot of info in the url.
+                        new_part = "&target=alias(" + encodeURIComponent(value.target) + ",'" + value.target +"')";
                     } else {
                         new_part = "&target=alias(color(" +encodeURIComponent(value.target) + ",'" + value.color +"'),'" + value.name +"')";
                     }
@@ -86,13 +93,8 @@ function color_from_graphite(str) {
 function find_definition (target_graphite, options) {
     var matching_i = undefined;
     for (var cfg_i = 0; cfg_i < options.targets.length && matching_i == undefined; cfg_i++) {
-        // alias in config
-        // currently this is not needed because we don't actually send aliases to graphite (yet)
-        if(options.targets[cfg_i].name != undefined && options.targets[cfg_i].name == target_graphite.target) {
-            matching_i = cfg_i;
-        }
         // string match (no globbing)
-        else if(options.targets[cfg_i].target == target_graphite.target) {
+        if(options.targets[cfg_i].target == target_graphite.target) {
             matching_i = cfg_i;
         }
         // glob match?

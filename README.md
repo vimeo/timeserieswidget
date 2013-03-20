@@ -120,20 +120,6 @@ For apache2 this works:
     Header set Access-Control-Allow-Methods "GET, OPTIONS"
     Header set Access-Control-Allow-Headers "origin, authorization, accept"
 
-### The code needs to be able to map targets returned from graphite back to your configuration...
-
-and when graphite returns the json data, the <a href="https://github.com/graphite-project/graphite-web/issues/248">target string can be rewritten</a>: functions can be reordered, function aliases replaced by the native functions, and integers shown a bit differently
-(often with an added `.0`).  This results in timeseries javascript console errors like `internal error: could not figure out which target_option target_graphite '<a target returned from graphite>' comes from`.
-
-The best solution is refactoring the graphite functions' `pathExpression` stuff, but that's no easy feat.
-For the time being, here are some tips to alleviate most of the problems.
-
-* if you have `scale()`, `movingAverage()` and potentially a few more in your targets, be wary of https://github.com/graphite-project/graphite-web/issues/103
-  and adjust your scales if needed to counter graphite's rewriting of arguments.
-* if you have `sum()` calls with multiple arguments, be wary that graphite might <a href="https://github.com/graphite-project/graphite-web/pull/135">change their order</a>
-* don't use function aliases, i.e. use `sumSeries()`, not `sum()`
-
-
 
 ## Flot client-side canvas graphs
 
