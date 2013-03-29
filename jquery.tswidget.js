@@ -228,6 +228,12 @@ function find_definition (target_graphite, options) {
                 options['states'] = {};
             }
             options['states'] = $.extend(options['states'], states);
+            if(! 'zoom' in options) {
+                options['zoom'] = {interactive: true};
+            }
+            if(! 'pan' in options) {
+                options['pan'] = {interactive: true};
+            }
 
             function suffixFormatterSI(val, axis) {
                 range = axis.max - axis.min;
@@ -284,14 +290,46 @@ function find_definition (target_graphite, options) {
                 if(!('markings' in options['grid'])) {
                     options['grid']['markings'] = [];
                 }
+                if(!('selection' in options)) {
+                    options['selection'] = 'xy';
+                }
+
                 for (var i = 0; i < events.length; i++) {
                     x = events[i].time * 1000;
                     options['grid']['markings'].push({ color: options['events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
                 }
                 state = options['state'] || 'lines';
-                return $.extend(options, options['states'][state]);
+                a = $.extend(options, options['states'][state]);
+                console.debug(a);
+                return a;
             }
             var plot = $.plot(div, all_targets, buildFlotOptions(options));
+            $div.bind('plotselected', function (event, ranges) {
+                alert("You selected " + ranges.xaxis.from + " to " + ranges.xaxis.to)
+
+                // clamp the zooming to prevent eternal zoom
+
+                if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) {
+                    ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+                }
+
+                if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
+                    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+                }
+
+                // do the zooming
+
+                plot = $.plot(div, getData(ranges.xaxis.from, ranges.xaxis.to),
+                    $.extend(true, {}, options, {
+                        xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                        yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+                    })
+                );
+
+                // don't fire event on the overview to prevent eternal loop
+
+                overview.setSelection(ranges, true);
+            });
             // add labels
             var o;
             for (var i = 0; i < events.length; i++) {
