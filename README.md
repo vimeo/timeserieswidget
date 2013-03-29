@@ -260,3 +260,4 @@ But I think I've come up with a solution that's fairly elegant.  Here's how it w
 * enabling certain interactivity features may set other options which may override specific customisations you did;
   consult the code and grep for the feature if you want to know more.
 * as a general rule, put all the options that only apply to a specific backend at the bottom of the config
+* to show events, set `anthracite_url` and/or `es_url` as shown in the examples.  both Anthracite and ElasticSearch(logstash) events are supported
