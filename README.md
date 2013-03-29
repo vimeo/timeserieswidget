@@ -50,7 +50,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
 <tr>
     <td>interactive zooming and panning</td>
     <td>NA</td>
-    <td>WIP</td>
+    <td>Y</td>
     <td>WIP</td>
 </tr>
 <tr>
