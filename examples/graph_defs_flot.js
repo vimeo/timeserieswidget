@@ -1,5 +1,6 @@
 graph_flot_simple_line = {
     graphite_url: "http://<graphite hostname:port>/render/",
+    es_url: "http://<elastic search machine>:9200/logstash-2013.03.29/_search?q=puppet",
     from: "-24hours",
     until: "now",
     height: "300",

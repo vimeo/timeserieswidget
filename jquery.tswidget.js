@@ -194,6 +194,7 @@ function find_definition (target_graphite, options) {
         $div.height(options.height);
         $div.width(options.width);
         var events = [];
+        var es_events = [];
         var all_targets = [];
         var add_targets = function(response_data) {
             for (var res_i = 0; res_i < response_data.length; res_i++) {
@@ -288,6 +289,10 @@ function find_definition (target_graphite, options) {
                     x = events[i].time * 1000;
                     options['grid']['markings'].push({ color: options['events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
                 }
+                for (var i = 0; i < es_events.length; i++) {
+                    x = Date.parse(es_events[i]['_source']['@timestamp']);
+                    options['grid']['markings'].push({ color: '#FF0066', lineWidth: 1, xaxis: { from: x, to: x} });
+                }
                 state = options['state'] || 'lines';
                 return $.extend(options, options['states'][state]);
             }
@@ -300,6 +305,16 @@ function find_definition (target_graphite, options) {
                 msg += 'color:' + options['events_text_color'] + ';font-size:smaller">';
                 msg += '<b>' + events[i].type + '</b></br>';
                 msg += events[i].desc
+                msg += '</div>';
+                $div.append(msg);
+            }
+            for (var i = 0; i < es_events.length; i++) {
+                o = plot.pointOffset({ x: Date.parse(es_events[i]['_source']['@timestamp']), y: 0});
+                msg = '<div style="background-color:#40FF00;position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 35 ) + 'px;';
+                msg += 'color:' + '#FF0066' + ';font-size:smaller">';
+                msg += '<b>tags</b>: ' + es_events[i]['_source']['@tags'].join(' ') + '</br>';
+                msg += '<b>env</b>: ' + es_events[i]['_source']['@fields']['environment'] + '</br>';
+                msg += '<b>msg</b>: ' + es_events[i]['_source']['@message'] + '</br>';
                 msg += '</div>';
                 $div.append(msg);
             }
@@ -352,6 +367,18 @@ function find_definition (target_graphite, options) {
                 error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
             }));
         }
+        if('es_url' in options){
+            requests.push($.ajax({
+                accepts: {text: 'application/json'},
+                cache: false,
+                dataType: 'json',
+                jsonp: 'json',
+                url: options['es_url'],
+                success: function(data, textStatus, jqXHR ) { es_events = data.hits.hits },
+                error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+            }));
+        }
+
         $.when.apply($, requests ).done(drawFlot);
     };
 
