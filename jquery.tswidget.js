@@ -116,6 +116,7 @@ function find_definition (target_graphite, options) {
     }
     var default_tswidget_options = {
         'events_color': '#ccff66',
+        'es_events_color': '#ff0066',
         'events_text_color': '#5C991F'
     }
 
@@ -291,7 +292,7 @@ function find_definition (target_graphite, options) {
                 }
                 for (var i = 0; i < es_events.length; i++) {
                     x = Date.parse(es_events[i]['_source']['@timestamp']);
-                    options['grid']['markings'].push({ color: '#FF0066', lineWidth: 1, xaxis: { from: x, to: x} });
+                    options['grid']['markings'].push({ color: options['es_events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
                 }
                 state = options['state'] || 'lines';
                 return $.extend(options, options['states'][state]);
@@ -313,8 +314,8 @@ function find_definition (target_graphite, options) {
                 msg = '<div style="background-color:#40FF00;position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 35 ) + 'px;';
                 msg += 'color:' + '#FF0066' + ';font-size:smaller">';
                 msg += '<b>tags</b>: ' + es_events[i]['_source']['@tags'].join(' ') + '</br>';
-                msg += '<b>env</b>: ' + es_events[i]['_source']['@fields']['environment'] + '</br>';
-                msg += '<b>msg</b>: ' + es_events[i]['_source']['@message'] + '</br>';
+                msg += "<b>env</b>: " + es_events[i]['_source']['@fields']['environment'] + '</br>';
+                msg += "<b>msg</b>: " + es_events[i]['_source']['@message'] + '</br>';
                 msg += '</div>';
                 $div.append(msg);
             }
