@@ -22,7 +22,7 @@ graph_rickshaw_simple_line = {
     legend_toggle: true,
     legend_reorder: true,
     legend_highlight: true,
-    hoover_details: true,
+    hover_details: true,
     line_stack_toggle: 'line_stack_form_rickshaw',
 };
 graph_rickshaw_fancy_stacked = {
@@ -73,7 +73,7 @@ graph_rickshaw_fancy_stacked = {
     legend_toggle: true,
     legend_reorder: true,
     legend_highlight: true,
-    hoover_details: true,
+    hover_details: true,
     line_stack_toggle: 'line_stack_form_rickshaw',
     y_axis: 'y_axis_rickshaw',
     x_axis: true,

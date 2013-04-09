@@ -428,7 +428,7 @@ function find_definition (target_graphite, options) {
                     element: document.getElementById(options['y_axis']),
                 });
             }
-            if(options['hoover_details']) {
+            if(options['hover_details']) {
                 var hoverDetail = new Rickshaw.Graph.HoverDetail( {
                     graph: graph
                 } );

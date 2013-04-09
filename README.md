@@ -40,7 +40,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>slow with many datapoints and/or multiple graphs (needs better <a href="https://github.com/graphite-project/graphite-web/issues/153">graphite consolidation</a>)</td>
 </tr>
 <tr>
-    <td>hoover over datapoints/graph -> popup with exact data</td>
+    <td>hover over datapoints/graph -> popup with exact data</td>
     <td>NA</td>
     <td>WIP (<a href="https://github.com/flot/flot/pull/867">flot pull 867</a>)</td>
     <td>Y</td>
@@ -58,7 +58,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>WIP</td>
 </tr>
 <tr>
-    <td>hoover over legend -> hilight on plot</td>
+    <td>hover over legend -> hilight on plot</td>
     <td>NA</td>
     <td>WIP</td>
     <td>Y</td>
