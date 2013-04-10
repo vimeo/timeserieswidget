@@ -131,12 +131,13 @@ This is a CORS restriction, see http://stackoverflow.com/questions/3595515/xmlht
 
 ### Examples
 
-The primary source of truth and information.  Check the [examples directory](https://github.com/Dieterbe/timeserieswidget/tree/master/examples)
+A lot can be learned by just looking at, and playing with the examples,
+so check the [examples directory](https://github.com/Dieterbe/timeserieswidget/tree/master/examples)
 
 The examples are designed so that:
 
-* there's a js file per backend (png, flot, rickshaw) defining a simple and fancy graph.
-* the simple graph is minimal and line-based, the fancy is area-based and demos all available options.
+* there's a js file per backend (png, flot, rickshaw), per graph (a simple and fancy one).
+* the simple graph is minimal and line-based, the fancy is area-based and demos most available options.
 * in a definition, we put (by convention) all common options first, backend-specific things afterwards.
 * there's an html file (6 in total) to show each graph (2) of each backend (3)
 * graph-compare.html includes all 6 on one page.
