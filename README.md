@@ -1,14 +1,9 @@
 ## TimeSeriesWidget
 
-Plugin to easily make time series graphs and update them on the fly using
-[Graphite url api](http://readthedocs.org/docs/graphite/en/latest/url-api.html) on the background,
-allowing you to easily add:
-
-* Client-side rendered, interactive, canvas-based graphs
-  (relying on [Flot](http://www.flotcharts.org/))
-* Client-side rendered, interactive, svg-based graphs
-  (relying on [Rickshaw](http://code.shutterstock.com/rickshaw/))
-* PNG's rendered by Graphite
+Plugin to easily make *highly interactive* time series (graphite) graph objects.
+(i.e. graphs where you can interactively toggle on/off individual series, inspect datapoints, zoom in realtime, etc)
+Supports [Flot](http://www.flotcharts.org/) (canvas) and [Rickshaw](http://code.shutterstock.com/rickshaw/) (svg) and
+standard graphite png images (in case you're nostalgic and don't like interactivity)
 
 Goals:
 * easy to use, elegant but powerful api, aimed to cover all your graphite/time series graphing needs.
