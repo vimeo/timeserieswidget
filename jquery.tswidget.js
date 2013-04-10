@@ -17,7 +17,7 @@ function build_graphite_url(options, raw) {
 
     internal_options = ['_t'];
     graphite_options = ['target', 'targets', 'from', 'until', 'rawData', 'format'];
-    graphite_png_options = ['width', 'height', 'template', 'margin', 'bgcolor',
+    graphite_png_options = ['areaMode', 'width', 'height', 'template', 'margin', 'bgcolor',
                          'fgcolor', 'fontName', 'fontSize', 'fontBold', 'fontItalic',
                          'yMin', 'yMax', 'colorList', 'title', 'vtitle', 'lineMode',
                          'lineWith', 'hideLegend', 'hideAxes', 'hideGrid', 'minXstep',
