@@ -69,6 +69,7 @@ graph_flot_fancy_stacked = {
     // clientside specific:
     line_stack_toggle: 'line_stack_form_flot',
     state: 'stacked',
+    hover_details: true,
     // flot specific:
     legend: { container: '#legend_flot', noColumns: 1 },
 };

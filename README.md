@@ -43,7 +43,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
 <tr>
     <td>hover over datapoints/graph -> popup with exact data</td>
     <td>NA</td>
-    <td>WIP (<a href="https://github.com/flot/flot/pull/867">flot pull 867</a>)</td>
+    <td>Y (<a href="https://github.com/flot/flot/pull/867">flot #867</a> would make it a bit better)</td>
     <td>Y</td>
 </tr>
 <tr>

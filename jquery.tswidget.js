@@ -191,6 +191,7 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphiteFlot.render = function(div, options, on_error) {
+        var id = div.getAttribute('id');
         $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
@@ -283,6 +284,10 @@ function find_definition (target_graphite, options) {
                 if(!('grid' in options)) {
                     options['grid'] = {};
                 }
+                if(options['hover_details']) {
+                    options['grid']['hoverable'] = true;
+                    options['grid']['autoHighlight'] = true;  // show datapoint being hilighted. true by default but hardcode to make sure
+                }
                 if(!('markings' in options['grid'])) {
                     options['grid']['markings'] = [];
                 }
@@ -339,6 +344,41 @@ function find_definition (target_graphite, options) {
                     $.plot(div, all_targets, buildFlotOptions(options));
                 }, false);
             }
+           function showTooltip(x, y, contents) {
+                $("<div id='tooltip_" + id + "'>" + contents + "</div>").css({
+                    position: "absolute",
+                    display: "none",
+                    top: y + 5,
+                    left: x + 5,
+                    border: "1px solid #fdd",
+                    padding: "2px",
+                    "background-color": "#fee",
+                    opacity: 0.80
+                }).appendTo("body").fadeIn(200);
+            }
+          var previousPoint = null;
+        $(div).bind("plothover", function (event, pos, item) {
+            if (item) {
+                if (previousPoint != item.dataIndex) {
+                    previousPoint = item.dataIndex;
+                    $("#tooltip_" + id).remove();
+                    var x = item.datapoint[0],
+                    y = item.datapoint[1].toFixed(2);
+                    //alert();
+                    var date = new Date(x);
+                    var hours = date.getHours();
+                    var minutes = date.getMinutes();
+                    var seconds = date.getSeconds();
+                    var formattedTime = hours + ':' + minutes + ':' + seconds;
+                    showTooltip(item.pageX, item.pageY,
+                        "series: " + item.series.label + "<br/>time: " + formattedTime + "<br/>value: " + y);
+                }
+            } else {
+                $("#tooltip_" + id).remove();
+                previousPoint = null;
+            }
+        });
+
         }
         urls = build_graphite_url(options, true);
         var requests = $.map(urls, function(url) {
