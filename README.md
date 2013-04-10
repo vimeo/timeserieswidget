@@ -2,7 +2,7 @@
 
 Plugin to easily make *highly interactive* time series (graphite) graph objects.
 (i.e. graphs where you can interactively toggle on/off individual series, inspect datapoints, zoom in realtime, etc)
-Supports [Flot](http://www.flotcharts.org/) (canvas) and [Rickshaw](http://code.shutterstock.com/rickshaw/) (svg) and
+Supports [Flot](http://www.flotcharts.org/) (canvas), [Rickshaw](http://code.shutterstock.com/rickshaw/) (svg) and
 standard graphite png images (in case you're nostalgic and don't like interactivity)
 
 Goals:
