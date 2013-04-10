@@ -14,11 +14,12 @@ Goals:
 * easy to use, elegant but powerful api, aimed to cover all your graphite/time series graphing needs.
 * only abstract where it makes sense.  Graphite, Flot, and Rickshaw api's are awesome and powerfull, expose them
 * aim for some consistency in configuration across backends (to the extent possible and sane)
+* be very similar/compatible to the existing graphite API (but extended for interactivity features)
 * provide all interactive features you would expect; so that all graphite dashboards can rely on the same
 code to render client-side graphs, minimizing redundant work and combining efforts.
 
 Feature comparison table.
-NA = not available (can't be done to my knowledge), WIP = work in progress (should be possible)
+NA = not available (can't be done to my knowledge), WIP = work in progress (should be possible. this basically means TODO)
 
 <table>
 <tr>
@@ -121,9 +122,8 @@ For apache2 this works:
     Header set Access-Control-Allow-Headers "origin, authorization, accept"
 
 
-## Flot client-side canvas graphs
+## Flot Timezone support
 
-see examples
 note: for timezone support, include timezone-js/src/date.js,
 Set the 'zoneFileBasePath' option to the url path needed to reach the included tz folder,
 and of course set the 'tz' parameter to your timezone.
@@ -132,132 +132,102 @@ Note if you load files straight from disk (such as the examples), you might see 
 This is a CORS restriction, see http://stackoverflow.com/questions/3595515/xmlhttprequest-error-origin-null-is-not-allowed-by-access-control-allow-origin
 
 
-## Rickshaw client-side svg graphs
+## Configuration
 
-### Minimal config
-```html
-<div id="graph">
+### Examples
+
+The primary source of truth and information.  Check the [examples directory](https://github.com/Dieterbe/timeserieswidget/tree/master/examples)
+
+The examples are designed so that:
+
+* there's a js file per backend (png, flot, rickshaw) defining a simple and fancy graph.
+* the simple graph is minimal and line-based, the fancy is area-based and demos all available options.
+* in a definition, we put (by convention) all common options first, backend-specific things afterwards.
+* there's an html file (6 in total) to show each graph (2) of each backend (3)
+* graph-compare.html includes all 6 on one page.
+* the html and js files are written so you can easily diff them.
+
+Obviously you'll probably need to adjust the targets to make the examples work with your graphite server.
+
+In general, we try to use the same options for all backends (i.e. make the flot/rickshaw backends respond to the same options as the graphite png api)
+So for the most part, the available options (see examples) closely match the available options from the [graphite api](http://graphite.readthedocs.org/en/1.0/url-api.html)
+Sometimes this is not possible.
+
+### Options that diverge from how graphite does things:
+* instead of `target=<foo>&target=<bar>(...)` we define a `targets` list option
+* in target definitions:
+  * don't use `alias()` or `color()`, we have alternatives ('name' and 'color' options)
+  * don't use `colorList`, i didn't even look into how to port this feature to flot/rickshaw cause you can easily avoid it
+
+### Backend specific options (see js defs files)
+
+#### png-specific
+options that only apply to graphite's native png renders:
 ```
-
-```js
-$("#graph").graphiteRick({
-    from: "-24hours",
-    targets: [
-        {target: "server.web1.load"},
-    ],
-});
+colors, areaMode, legends, etc
 ```
-
-### Advanced examples
-
-See 'examples' directory.  
-All example files are created so that you can easily diff between png and rickshaw implementations.
-There's also a file with both a png and rickshaw graph for easy comparison
-(this is used in the screenshot above)
-
-
-Note that graphite options for visual things (colors, areaMode, legends, etc) will be ignored,
-but we provide alternatives (work in progress though).  There's a bunch of options; for now just look them
-up in the source code.
-
-
-### TODO
-
-* timezone
-* zoom, panning
-
-## Optional keys for flot/rickshaw
-
-* 'suffixes': false, 'binary' or 'si' (defaults to 'si')
- automatically show large numbers using a prefix.  like graphite does, but configurable
-
-## Graphite PNG's
-### How it works
-
-One. Adding a graph to a page:
-
-```html
-<img id="graph">
+#### clientside specific
+options that apply to both flot and rickshaw: when a tswidget feature can't be implemented in flot/rickshaw directly, tswidget provides
+the code, and it works with either the flot or rickshaw backend.
 ```
-
-```js
-$("#graph").graphite({
-    from: "-24hours",
-    target: [
-        "server.web1.load",
-    ],
-});
+'suffixes': false, 'binary' or 'si' (defaults to 'si')
 ```
+automatically show large numbers using a prefix.  like graphite does, but configurable
 
-Two. Setting custom options:
-
-```html
-<img id="graph">
 ```
-
-```js
-$("#graph").graphite({
-    from: "-24hours",
-    colorList: "red,green",
-    target: [
-        "alias(summarize(stats.site1.auth.login.error,'30min'),'Login Errors')",
-        "alias(summarize(stats.site1.auth.login.user,'30min'),'Login Success')"
-    ],
-    title: "Login errors vs Success"
-});
+anthracite_url
+es_url
 ```
+show events from anthracite and/or elasticSearch (logstash) datasource.
 
-Three. Setting global defaults:
+```
+line_stack_toggle: 'line_stack_form_flot',
+state: 'stacked',
+```
+DOM id for line/stack selector form, and initial state
+```
+hover_details
+```
+hover with mouse over graph datapoints to yield popups with information (series and X/Y values) about nearest datapoint
+
+#### flot specific
+
+when a tswidget feature maps directly to a native flot feature, or it doesn't work with rickshaw
+or just any option in the flot api (legend, grid, ...)
+
+#### rickshaw specific
+
+when a tswidget feature maps directly to a native rickshaw feature, or it doesn't work with flot
+or just any option in the rickshaw api
+
+## Default configuration
+
+(works across all backends)
 
 ```js
 $.fn.graphite.defaults.width = "450"
 $.fn.graphite.defaults.height = "300"
 ```
 
-Four. Updating existing graph:
+## Updating existing graph:
+
+(only for png backend)
 
 ```js
 $.fn.graphite.update($("#graph"), {from: "-3days", lineWidth: "2"});
 ```
 
-Five. Setting a custom api url--the default is "/render/":
+## Misc notes
 
-```js
-$.fn.graphite.defaults.graphite_url = "http://myserver/render/"
-```
+### about color definitions
+(for targets but presumably other things as well)
 
-or
+* graphite supports color names like 'green' and hexadecimal RGB codes like '1088ef' (it doesn't allow a `#` prefix)
+* flot generally uses names or CSS color specifications like "rgb(255, 100, 123)" or '#1088ef',
+  or an integer that specifies which of auto-generated colors to select, e.g. 0 will get color no. 0
+  it unofficially supports graphite-style color codes (with '#') but only in line mode, so we keep compat with graphite
+  in your config (no '#'), but automatically add the '#' when needed.  same for rickshaw which requires the '#'.
 
-```js
-$("#graph").graphite({
-    graphite_url: "http://myserver/render/"
-});
-```
-
-### $(img).graphite(options)
-
-You should probably specify a target. All other settings are optional. All
-settings will be passed through to the graphite api.
-
-
-# Configuration
-retaining a familiar 'graphite function api'-feel, easy switching between backends,
-designing an API on top of flot/rickshaw tailored towards timeseries and making common features easily available,
-while still providing access to flot/rickshaw internals for deep customisation, is no easy task.
-But I think I've come up with a solution that's fairly elegant.  Here's how it works.
-
-* the general rule is: each option in the option dict corresponds with a graphite url parameter name
-* instead of `target=<foo>&target=<bar>(...)` we define a `targets` list option
-* in target definitions:
-  * don't use `alias()` or `color()`, we have alternatives (see below)
-  * don't use `colorList`, i didn't even look into how to port this feature to flot/rickshaw cause you can easily avoid it
-  * graphite supports color names like 'green' and hexadecimal RGB codes like '1088ef' (it doesn't allow a `#` prefix)
-  * flot generally uses names or CSS color specifications like "rgb(255, 100, 123)" or '#1088ef',
-    or an integer that specifies which of auto-generated colors to select, e.g. 0 will get color no. 0
-    it unofficially supports graphite-style color codes (with '#') but only in line mode, so we keep compat with graphite
-    in your config (no '#'), but automatically add the '#' when needed.  same for rickshaw which requires the '#'.
-
-* enabling certain interactivity features may set other options which may override specific customisations you did;
-  consult the code and grep for the feature if you want to know more.
-* as a general rule, put all the options that only apply to a specific backend at the bottom of the config
-* to show events, set `anthracite_url` and/or `es_url` as shown in the examples.  both Anthracite and ElasticSearch(logstash) events are supported
+## Some clientside specific options
+* may set or override flot/rickshaw-specific options (such as grid, legend, ...) if you've set them. 
+  this should rarely be a problem, consult the code and grep for the feature if you want to know more.

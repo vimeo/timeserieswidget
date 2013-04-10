@@ -16,14 +16,15 @@ graph_rickshaw_simple_line = {
     ],
     title: 'Memcache',
     vtitle: 'requests/second',
+    // client-side specific:
+    line_stack_toggle: 'line_stack_form_rickshaw',
+    // rickshaw specific:
     y_axis: 'y_axis_rickshaw',
     x_axis: true,
     legend: 'legend_rickshaw',
     legend_toggle: true,
     legend_reorder: true,
     legend_highlight: true,
-    hover_details: true,
-    line_stack_toggle: 'line_stack_form_rickshaw',
 };
 graph_rickshaw_fancy_stacked = {
     graphite_url: "http://<graphite hostname:port>/render/",
@@ -69,16 +70,18 @@ graph_rickshaw_fancy_stacked = {
          target: "scale(divideSeries(stats.timers.render_time.bin_inf,stats.timers.render_time.count),60.0)"
         }
     ],
+    title: "render time histogram",
+    vtitle: "rel. freq with scale adjustment per band",
+    drawNullAsZero: false,
+    // client-side specific:
+    line_stack_toggle: 'line_stack_form_rickshaw',
+    state: 'stacked',
+    hover_details: true,
+    // rickshaw specific:
+    y_axis: 'y_axis_rickshaw',
+    x_axis: true,
     legend: 'legend_rickshaw',
     legend_toggle: true,
     legend_reorder: true,
     legend_highlight: true,
-    hover_details: true,
-    line_stack_toggle: 'line_stack_form_rickshaw',
-    y_axis: 'y_axis_rickshaw',
-    x_axis: true,
-    title: "render time histogram",
-    vtitle: "rel. freq with scale adjustment per band",
-    drawNullAsZero: false,
-    state: 'stacked'
 };

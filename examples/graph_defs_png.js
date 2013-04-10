@@ -17,6 +17,7 @@ graph_png_simple_line = {
     title: 'Memcache',
     vtitle: 'requests/second',
     drawNullAsZero: "false",
+    // png specific:
     hideLegend: "false",
 };
 
@@ -67,6 +68,7 @@ graph_png_fancy_stacked = {
     title: "render time histogram (stacked graph)",
     vtitle: "rel. freq with scale adjustment per band",
     drawNullAsZero: false,
+    // png specific:
     lineMode: "slope",
     areaMode: "stacked",
     hideLegend: "false"
