@@ -75,7 +75,11 @@ function build_graphite_url(options, raw) {
 };
 
 function build_anthracite_url(options) {
-    return strip_ending_slash(options.anthracite_url) + '/jsonp';
+    url = strip_ending_slash(options.anthracite_url) + '/events/jsonp';
+    if ('events_query' in options) {
+        url += '?q=' + options['events_query'];
+    }
+    return url;
 }
 
 function find_definition (target_graphite, options) {
