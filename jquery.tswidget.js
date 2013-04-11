@@ -49,7 +49,7 @@ function build_graphite_url(options, raw) {
                         // though this duplicates a lot of info in the url.
                         new_part = "&target=alias(" + encodeURIComponent(value.target) + ",'" + value.target +"')";
                     } else {
-                        new_part = "&target=alias(color(" +encodeURIComponent(value.target) + ",'" + value.color +"'),'" + value.name +"')";
+                        new_part = "&target=alias(color(" +encodeURIComponent(value.target + ",'" + value.color) +"'),'" + value.name +"')";
                     }
                     // note that this doesn't account for non-target args that will get added to url later, but this is good enough.
                     if (url.length + url_target.length + new_part.length > limit) {
@@ -76,18 +76,6 @@ function build_graphite_url(options, raw) {
 
 function build_anthracite_url(options) {
     return strip_ending_slash(options.anthracite_url) + '/jsonp';
-}
-
-
-function is_rgb_without_hash(str) {
-    return (/^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/i.test(str));
-}
-// convert a colorspec from graphite into something that flot/rickshaw likes
-function color_from_graphite(str) {
-    if (is_rgb_without_hash(str)) {
-        return '#' + str;
-    }
-    return str;
 }
 
 function find_definition (target_graphite, options) {
@@ -279,7 +267,7 @@ function find_definition (target_graphite, options) {
                     options['yaxes'] = [{position: 'left', axisLabel: options['vtitle']}];
                 }
                 for (i = 0; i < options['targets'].length; i++ ) {
-                    options['targets'][i]['color'] = color_from_graphite(options['targets'][i]['color']);
+                    options['targets'][i]['color'] = options['targets'][i]['color'];
                 }
                 if(!('grid' in options)) {
                     options['grid'] = {};
@@ -454,7 +442,7 @@ function find_definition (target_graphite, options) {
             options['element'] = div;
             options['series'] = all_targets
             for (i = 0; i < options['targets'].length; i++ ) {
-                options['targets'][i]['color'] = color_from_graphite(options['targets'][i]['color']);
+                options['targets'][i]['color'] = options['targets'][i]['color'];
             }
             var graph = new Rickshaw.Graph(options);
             if(options['x_axis']) {

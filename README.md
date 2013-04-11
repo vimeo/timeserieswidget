@@ -216,13 +216,16 @@ $.fn.graphite.update($("#graph"), {from: "-3days", lineWidth: "2"});
 ## Misc notes
 
 ### about color definitions
-(for targets but presumably other things as well)
 
-* graphite supports color names like 'green' and hexadecimal RGB codes like '1088ef' (it doesn't allow a `#` prefix)
+short story:  use rgb codes like '#1088ef', to be compatible with all 3 (graphite/flot/rickshaw).
+or find something else that works with all three and update this.
+
+for targets but presumably other things as well:
+* graphite supports color names like 'green' and hexadecimal RGB codes like '#1088ef'
 * flot generally uses names or CSS color specifications like "rgb(255, 100, 123)" or '#1088ef',
   or an integer that specifies which of auto-generated colors to select, e.g. 0 will get color no. 0
-  it unofficially supports graphite-style color codes (with '#') but only in line mode, so we keep compat with graphite
-  in your config (no '#'), but automatically add the '#' when needed.  same for rickshaw which requires the '#'.
+  it unofficially supports color codes (without '#') but only in line mode.
+* rickshaw supports a few things, but for hex codes, it requires the '#'
 
 ## Some clientside specific options
 * may set or override flot/rickshaw-specific options (such as grid, legend, ...) if you've set them. 

@@ -6,15 +6,15 @@ graph_flot_simple_line = {
     width: '740',
     targets: [
         {name: 'series 1',
-         color: 'CC6699',
+         color: '#CC6699',
          target: 'randomWalk("random1")',
         },
         {name: 'series 2',
-         color: '2FFF00',
+         color: '#2FFF00',
          target: 'randomWalk("random2")'
         },
         {name: 'series 3',
-         color: '0000FF',
+         color: '#0000FF',
          target: 'randomWalk("random3")'
         }
     ],
