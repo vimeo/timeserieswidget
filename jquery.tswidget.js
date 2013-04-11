@@ -99,8 +99,27 @@ function find_definition (target_graphite, options) {
 }
 
 (function ($) {
+    /*
+    from graphite-web-0.9.9/graphTemplates.conf.example:
+
+    [default]
+    background = black
+    foreground = white
+    majorLine = white
+    minorLine = grey
+    lineColors = blue,green,red,purple,brown,yellow,aqua,grey,magenta,pink,gold,rose
+    fontName = Sans
+    fontSize = 10
+    fontBold = False
+    fontItalic = False
+
+    definitions below are from http://graphite.readthedocs.org/en/1.0/url-api.html
+    */
     var default_graphite_options = {
-        'fgcolor' : '#ffffff'
+        'bgcolor': '#000000', // background color of the graph
+        'fgcolor' : '#ffffff',  // title, legend text, and axis labels
+        'majorLine': '#ffffff',
+        'minorLine': '#afafaf'
     }
     var default_tswidget_options = {
         'events_color': '#ccff66',
@@ -248,11 +267,21 @@ function find_definition (target_graphite, options) {
             }
 
             var buildFlotOptions = function(options) {
-                options['xaxis'] = { color: options['fgcolor'], mode: 'time'};
+                // xaxis color = title color and horizontal lines in grid
+                // yaxis color = vtitle color and vertical lines in grid
+                // xaxis tickcolor = override vertical lines in grid
+                // yaxis tickcolor = override horizontal lines in grid
+                // note: flot doesn't distinguish between major and minor line
+                // so i use minor, because graphite uses very thin lines which make them look less intense,
+                // in flot they seem to be a bit thicker, so generally make them less intense to have them look similar.
+                // although they still look more intense than in graphite though.
+                // tuning tickLength doesn't seem to help (and no lineWidth for axis..). maybe a graphite bug
+                options['tickColor'] = options['minorLine'];
+                options['xaxis'] = { color: options['fgcolor'], tickColor: options['tickColor'], mode: 'time'};
                 if ('tz' in options) {
                     options['xaxis']['timezone'] = options['tz'];
                 }
-                options['yaxis'] = { color: options['fgcolor'], tickFormatter: suffixFormatterSI};
+                options['yaxis'] = { color: options['fgcolor'], tickColor: options['tickColor'], tickFormatter: suffixFormatterSI};
                 if('suffixes' in options) {
                     if(options['suffixes'] == 'binary') {
                         options['yaxis']['tickFormatter'] = suffixFormatterBinary;
