@@ -385,14 +385,12 @@ function find_definition (target_graphite, options) {
                     $("#tooltip_" + id).remove();
                     var x = item.datapoint[0],
                     y = item.datapoint[1].toFixed(2);
-                    //alert();
                     var date = new Date(x);
-                    var hours = date.getHours();
-                    var minutes = date.getMinutes();
-                    var seconds = date.getSeconds();
-                    var formattedTime = hours + ':' + minutes + ':' + seconds;
                     showTooltip(item.pageX, item.pageY,
-                        "series: " + item.series.label + "<br/>time: " + formattedTime + "<br/>value: " + y);
+                        "Series: " + item.series.label +
+                        "<br/>Local Time: " + date.toLocaleString() +
+                        "<br/>UTC Time: " + date.toUTCString() + ")" +
+                        "<br/>Value: " + y);
                 }
             } else {
                 $("#tooltip_" + id).remove();
