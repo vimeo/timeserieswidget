@@ -1,9 +1,9 @@
 [submodule "rickshaw"]
 	path = rickshaw
-	url = git://github.com/shutterstock/rickshaw.git
+	url = https://github.com/shutterstock/rickshaw
 [submodule "flot"]
 	path = flot
-	url = git://github.com/flot/flot.git
+	url = https://github.com/flot/flot
 [submodule "timezone-js"]
 	path = timezone-js
-	url = git://github.com/mde/timezone-js.git
+	url = https://github.com/mde/timezone-js
