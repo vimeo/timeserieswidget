@@ -70,7 +70,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>NA</td>
     <td>WIP (<a href="https://github.com/flot/flot/pull/848">flot pull 848</a>,
              <a href="https://github.com/flot/flot/issues/869">flot pull 869</a>,
-             <a href="https://github.com/Dieterbe/timeserieswidget/tree/flot-legend-toggle">branch flot-legend-toggle</a>)</td>
+             <a href="https://github.com/vimeo/timeserieswidget/tree/flot-legend-toggle">branch flot-legend-toggle</a>)</td>
     <td>Y</td>
 </tr>
 <tr>
@@ -96,8 +96,8 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
 
 **any web code that can generate graphite urls can use this library with minimal transition work**
 
-![Screenshot](https://raw.github.com/Dieterbe/timeserieswidget/master/screenshots/flot-annotated-event.png)
-![Screenshot](https://raw.github.com/Dieterbe/timeserieswidget/master/screenshots/compare-stacked.png)
+![Screenshot](https://raw.github.com/vimeo/timeserieswidget/master/screenshots/flot-annotated-event.png)
+![Screenshot](https://raw.github.com/vimeo/timeserieswidget/master/screenshots/compare-stacked.png)
 
 ## Installation
 
@@ -132,7 +132,7 @@ This is a CORS restriction, see http://stackoverflow.com/questions/3595515/xmlht
 ### Examples
 
 A lot can be learned by just looking at, and playing with the examples,
-so check the [examples directory](https://github.com/Dieterbe/timeserieswidget/tree/master/examples)
+so check the [examples directory](https://github.com/vimeo/timeserieswidget/tree/master/examples)
 
 The examples are designed so that:
 
