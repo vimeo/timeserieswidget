@@ -5,16 +5,9 @@ function strip_ending_slash(str) {
     return str;
 }
 
-// return a list of urls from the requested parameters
-// why N urls? because sometimes urls would become too long (with many targets)
-// it's up to the caller to deal with this.
-function build_graphite_url(options, raw) {
+function build_graphite_options(options, raw) {
     raw = raw || false;
-    var limit = 2000;  // http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
-    var url = options.graphite_url + "?";
-    var url_target = '';  // will contain the part of a url with target args
-    var target_parts = []; // will contain one or more of the above, depending on limit
-
+    var clean_options = [];
     internal_options = ['_t'];
     graphite_options = ['target', 'targets', 'from', 'until', 'rawData', 'format'];
     graphite_png_options = ['areaMode', 'width', 'height', 'template', 'margin', 'bgcolor',
@@ -24,8 +17,12 @@ function build_graphite_url(options, raw) {
                          'majorGridlineColor', 'minorGridLineColor', 'minorY',
                          'thickness', 'min', 'max', 'tz'];
 
-    // use random parameter to force image refresh
-    options["_t"] = options["_t"] || Math.random();
+    if(raw) {
+        options['format'] = 'json';
+    } else {
+        // use random parameter to force image refresh
+        options["_t"] = options["_t"] || Math.random();
+    }
 
     $.each(options, function (key, value) {
         if(raw) {
@@ -47,32 +44,32 @@ function build_graphite_url(options, raw) {
                         // so we need a good string identifier and set it using alias() (which graphite will honor)
                         // so that we recognize the returned output. simplest is just to include the target spec again
                         // though this duplicates a lot of info in the url.
-                        new_part = "&target=alias(" + encodeURIComponent(value.target) + ",'" + value.target +"')";
+                        clean_options.push("target=alias(" + encodeURIComponent(value.target) + ",'" + value.target +"')");
                     } else {
-                        new_part = "&target=alias(color(" +encodeURIComponent(value.target + ",'" + value.color) +"'),'" + value.name +"')";
+                        clean_options.push("target=alias(color(" +encodeURIComponent(value.target + ",'" + value.color) +"'),'" + value.name +"')");
                     }
-                    // note that this doesn't account for non-target args that will get added to url later, but this is good enough.
-                    if (url.length + url_target.length + new_part.length > limit) {
-                        target_parts.push(url_target);
-                        url_target = "";
-                    }
-                    url_target += new_part;
             });
         } else if (value !== null) {
-            // key can be 'target' here, so the 'targets' option doesn't have to be set (see above)
-            // so url_target can remain empty sometimes, which is fine. though using 'targets' is
-            // probably the better way.
-            url += "&" + key + "=" + encodeURIComponent(value);
+            clean_options.push(key + "=" + encodeURIComponent(value));
         }
     });
-    target_parts.push(url_target);
-    return $.map(target_parts, function(target_part) {
-        if(raw) {
-            target_part += '&format=json';
+    return clean_options;
+}
+
+// build url for an image. but GET url's are limited in length, so if you have many/long params, some may be missing.
+// could be made smarter for example to favor non-target options because we usually don't want to loose any of those.
+function build_graphite_url(options) {
+    var limit = 2000;  // http://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers
+    var url = options.graphite_url + "?";
+
+    options = build_graphite_options(options, false);
+    $.map(options, function(option) {
+        if (url.length + option.length < limit) {
+            url += '&' + option;
         }
-        return (url + target_part).replace(/\?&/, "?");
     });
-};
+    return url.replace(/\?&/, "?");
+}
 
 function build_anthracite_url(options) {
     url = strip_ending_slash(options.anthracite_url) + '/events/jsonp';
@@ -151,7 +148,7 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphite.render = function($img, options) {
-        $img.attr("src", build_graphite_url(options)[0]); // TODO: ideally we would actually show multiple images
+        $img.attr("src", build_graphite_url(options));
         $img.attr("height", options.height);
         $img.attr("width", options.width);
     };
@@ -424,23 +421,23 @@ function find_definition (target_graphite, options) {
         });
 
         }
-        urls = build_graphite_url(options, true);
-        var requests = $.map(urls, function(url) {
-            return $.ajax({
-                accepts: {text: 'application/json'},
-                cache: false,
-                dataType: 'jsonp',
-                jsonp: 'jsonp',
-                url: url,
-                success: function(data, textStatus, jqXHR ) {
-                    if(data.length == 0 ) {
-                        console.warn("no data in graphite response");
-                    }
-                    add_targets(data);
-                },
-                error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
-            });
-        });
+        data = build_graphite_options(options, true);
+        var requests = [];
+        requests.push($.ajax({
+            accepts: {text: 'application/json'},
+            cache: false,
+            dataType: 'json',
+            url: options['graphite_url'],
+            type: "POST",
+            data: data.join('&'),
+            success: function(data, textStatus, jqXHR ) {
+                if(data.length == 0 ) {
+                    console.warn("no data in graphite response");
+                }
+                add_targets(data);
+            },
+            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+        }));
         if('anthracite_url' in options){
             requests.push($.ajax({
                 accepts: {text: 'application/json'},
@@ -575,12 +572,14 @@ function find_definition (target_graphite, options) {
                 }, false);
             }
         }
+        data = build_graphite_options(options, true);
         $.ajax({
             accepts: {text: 'application/json'},
             cache: false,
-            dataType: 'jsonp',
-            jsonp: 'jsonp',
-            url: build_graphite_url(options, true)[0], // TODO: support for multiple urls, like flot has
+            dataType: 'json',
+            type: 'POST',
+            data: data.join('&'),
+            url: options['graphite_url'],
             error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
           }).done(drawRick);
     };
