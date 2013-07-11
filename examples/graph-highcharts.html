@@ -1,0 +1,16 @@
+<html><head>
+        <script src="../jquery.min.js"></script>
+        <script src="../jquery.tswidget.js"></script>
+        <script src="../graphite_helpers.js"></script>
+        <script src="../highcharts/highcharts.js"></script>
+        <script src="graph-highcharts.js"></script>
+        <link type="text/css" rel="stylesheet" href="../tswidget.css">
+    </head>
+    <body>
+        <div class="chart_container highcharts" id="chart_highcharts"></div>
+        <form class="toggler" id="line_stack_form_highcharts"></form> 
+        <script language="javascript">
+            $("#chart_highcharts").graphiteHighcharts(graph_highcharts_options, function(err) { console.log(err); });
+        </script>
+    </body>
+</html>

@@ -198,6 +198,21 @@ function find_definition (target_graphite, options) {
         });
     };
 
+    $.fn.graphiteHighcharts = function (options, on_error) {
+        if ('zoneFileBasePath' in options) {
+            timezoneJS.timezone.zoneFileBasePath = options['zoneFileBasePath'];
+            timezoneJS.timezone.init();
+        }
+        options = options || {};
+        var settings = $.extend({}, default_graphite_options, default_tswidget_options, $.fn.graphite.defaults, options);
+
+        return this.each(function () {
+            $this = $(this);
+            $this.data("graphOptions", settings);
+            $.fn.graphiteHighcharts.render(this, settings, on_error);
+        });
+    };
+
     $.fn.graphiteFlot.render = function(div, options, on_error) {
         var id = div.getAttribute('id');
         $div = $(div);
@@ -584,7 +599,204 @@ function find_definition (target_graphite, options) {
           }).done(drawRick);
     };
 
+    $.fn.graphiteHighcharts.render = function(div, options, on_error) {
+        var id = div.getAttribute('id');
+        $div = $(div);
+        $div.height(options.height);
+        $div.width(options.width);
+        var drawHighcharts = function(resp_graphite) {
+            var hsoptions = {
+                chart: {
+                    renderTo: id,
+                    type: 'area',
+                    zoomType: 'xy',
+                    backgroundColor: options.bgcolor,
+                    animation: false
+                },
+                exporting: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
+                legend: {
+                    borderWidth: 0,
+                    useHTML: false,
+                    itemHoverStyle: {
+                        color: 'red',
+                    },
+                    itemStyle: {
+                        color: options.fgcolor
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        lineWidth: 0.8,
+                        marker: {
+                            enabled: false
+                        },
+                    },
+                    spline: {
+                        lineWidth: 0.8,
+                        marker: {
+                            enabled: false
+                        },
+                    },
+                    area: {
+                        stacking: 'normal',
+                        marker: {
+                            enabled: false
+                        },
+                        lineWidth: 0.8
+                    },
+                    areaspline: {
+                        stacking: 'normal',
+                        marker: {
+                            enabled: false
+                        },
+                        lineWidth: 0.8
+                    }
+                },
+                title: {
+                    text: options.title,
+                    style: {
+                        color: options.fgcolor
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 50,
+                    labels: {
+                        rotation: -45,
+                        align: 'right'
+                    },
+                    lineColor: '#777',
+                    tickColor: '#777',
+                    maxPadding: 0.01,
+                    minPadding: 0.01,
+                    gridLineWidth: 0.2
+                },
+                yAxis: {
+                    gridLineColor: 'rgba(255, 255, 255, .3)',
+                    minorGridLineColor: 'rgba(255,255,255,0.1)',
+                    title: {
+                        text: options.vtitle,
+                        style: {
+                            color: options.fgcolor
+                        }
+                    },
+                    maxPadding: 0.01,
+                    minPadding: 0.01
+                },
+                tooltip: {
+                    enabled: options.hover_details,
+                    crosshairs:[{width:1, color:'#ccc'},{width:1, color:'#ccc'}],
+                    borderWidth: 0,
+                    backgroundColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                        stops: [
+                            [0, 'rgba(96, 96, 96, .8)'],
+                            [1, 'rgba(16, 16, 16, .8)']
+                        ]
+                    },
+                    style: {
+                        color: '#FFF'
+                    },
+                    useHTML: true,
+                    formatter: function() {
+                        return "Series: " + this.series.name +
+                               "<br/>Local Time: " + Highcharts.dateFormat('%A %B %e %Y %H:%M', this.x) +
+                               "<br/>Value: " + Highcharts.numberFormat(this.y, 2);
+                    }
+                },
+                series: []
+            }; 
+            for (var res_i = 0; res_i < resp_graphite.length; res_i++) {
+                var target = find_definition(resp_graphite[res_i], options);
+                var hstarget = {
+                    data: [],
+                    events: {
+                        click: function() {
+                            var q;
+                            if($.isArray(this.graphite_metric)) {
+                                q = '^' + this.options.graphite_metric.join('$|^') + '$';
+                            } else {
+                                q = '^' + this.options.graphite_metric + '$';
+                            }
+                            window.location = "/inspect/" + q;
+                        }
+                    },
+                    name: options.legend.labelFormatter(target.name),
+                    type: "line",
+                    animation: false
+                };
+                hstarget.graphite_metric = target.graphite_metric;
+                if (options["series"] && options["series"].stack) {
+                    hstarget.type = "area";
+                }
+                for (var i in resp_graphite[res_i].datapoints) {
+                    hstarget.data.push({
+                        x: resp_graphite[res_i].datapoints[i][1] * 1000,
+                        y: resp_graphite[res_i].datapoints[i][0],
+                    });
+                }
+                hsoptions.series.push(hstarget)
+            }
 
+            var hschart = new Highcharts.Chart(hsoptions);
+            if (options['line_stack_toggle'])
+            {
+                var form = document.getElementById(options['line_stack_toggle']);
+                var optionshtml = '';
+
+                if (options["series"] && options["series"].stack)
+                {
+                    optionshtml += '<option value="areastack">Stacked Area</option>';
+                    optionshtml += '<option value="line">Line</option>';
+                } else {
+                    optionshtml += '<option value="line">Line</option>';
+                    optionshtml += '<option value="areastack">Stacked Area</option>';
+                }
+                optionshtml += 
+                    '<option value="spline">Spline</option>' +
+                    '<option value="area">Area</option>' +
+                    '<option value="areaspline">Area Spline</option>' +
+                    '<option value="stackedareaspline">Stacked Area Spline</option>' +
+                    '</select>';
+                form.innerHTML = '<select>' + optionshtml + '</select>';
+
+                $("select", form).change(function() {
+                    for (var i in hsoptions.series) {
+                        var series = hsoptions.series[i];
+                        series.stack = i;
+                        if (this.value == "areastack") {
+                            series.type = "area";
+                            series.stack = 1;
+                        } else if (this.value == "area") {
+                            series.type = "area";
+                        } else if (this.value == "stackedareaspline") {
+                            series.type = "areaspline";
+                            series.stack = 1;
+                        } else {
+                            series.type = this.value;
+                        }
+                    }
+                    hschart = new Highcharts.Chart(hsoptions);
+                });
+                
+            }
+        };
+        data = build_graphite_options(options, true);
+        $.ajax({
+            accepts: {text: 'application/json'},
+            cache: false,
+            dataType: 'json',
+            url: options['graphite_url'],
+            type: "POST",
+            data: data.join('&'),
+            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+        }).done(drawHighcharts);
+    };
     // Default settings. 
     // Override with the options argument for per-case setup
     // or set $.fn.graphite.defaults.<value> for global changes
