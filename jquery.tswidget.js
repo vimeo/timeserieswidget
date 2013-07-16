@@ -737,10 +737,10 @@ function find_definition (target_graphite, options) {
                     hstarget.type = "area";
                 }
                 for (var i in resp_graphite[res_i].datapoints) {
-                    hstarget.data.push({
-                        x: resp_graphite[res_i].datapoints[i][1] * 1000,
-                        y: resp_graphite[res_i].datapoints[i][0],
-                    });
+                    hstarget.data.push([
+                        resp_graphite[res_i].datapoints[i][1] * 1000,
+                        resp_graphite[res_i].datapoints[i][0]
+                    ]);
                 }
                 hsoptions.series.push(hstarget)
             }
