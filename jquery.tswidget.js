@@ -621,7 +621,7 @@ function find_definition (target_graphite, options) {
                 },
                 legend: {
                     borderWidth: 0,
-                    useHTML: false,
+                    useHTML: true,
                     itemHoverStyle: {
                         color: 'red',
                     },
@@ -681,9 +681,7 @@ function find_definition (target_graphite, options) {
                     minorGridLineColor: 'rgba(255,255,255,0.1)',
                     title: {
                         text: options.vtitle,
-                        style: {
-                            color: options.fgcolor
-                        }
+                        useHTML: true
                     },
                     maxPadding: 0.01,
                     minPadding: 0.01
