@@ -1,5 +1,5 @@
 graph_highcharts_options = {
-    graphite_url: 'http://localhost:8000/render/',
+    graphite_url: 'http://<graphite hostname:port>/render/',
     from: '-24hours',
     until: 'now',
     height: '300',
