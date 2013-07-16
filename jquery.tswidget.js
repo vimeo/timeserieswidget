@@ -729,6 +729,9 @@ function find_definition (target_graphite, options) {
                 };
                 if (options.legend && options.legend.labelFormatter) {
                     hstarget.name = options.legend.labelFormatter(target.name);
+                    // Forbid anchor tags because it will break ability to
+                    // hide/show series.
+                    hstarget.name = hstarget.name.replace(/<\/?a[^>]*?>/ig, "");
                 }
                 hstarget.graphite_metric = target.graphite_metric;
                 if (options["series"] && options["series"].stack) {
