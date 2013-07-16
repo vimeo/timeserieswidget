@@ -753,31 +753,20 @@ function find_definition (target_graphite, options) {
 
                 if (options["series"] && options["series"].stack)
                 {
-                    optionshtml += '<option value="areastack">Stacked Area</option>';
-                    optionshtml += '<option value="line">Line</option>';
+                    optionshtml += '<option value="stack">stack</option>';
+                    optionshtml += '<option value="line">lines</option>';
                 } else {
-                    optionshtml += '<option value="line">Line</option>';
-                    optionshtml += '<option value="areastack">Stacked Area</option>';
+                    optionshtml += '<option value="line">lines</option>';
+                    optionshtml += '<option value="stack">stack</option>';
                 }
-                optionshtml += 
-                    '<option value="spline">Spline</option>' +
-                    '<option value="area">Area</option>' +
-                    '<option value="areaspline">Area Spline</option>' +
-                    '<option value="stackedareaspline">Stacked Area Spline</option>' +
-                    '</select>';
                 form.innerHTML = '<select>' + optionshtml + '</select>';
 
                 $("select", form).change(function() {
                     for (var i in hsoptions.series) {
                         var series = hsoptions.series[i];
                         series.stack = i;
-                        if (this.value == "areastack") {
+                        if (this.value == "stack") {
                             series.type = "area";
-                            series.stack = 1;
-                        } else if (this.value == "area") {
-                            series.type = "area";
-                        } else if (this.value == "stackedareaspline") {
-                            series.type = "areaspline";
                             series.stack = 1;
                         } else {
                             series.type = this.value;
@@ -785,7 +774,6 @@ function find_definition (target_graphite, options) {
                     }
                     hschart = new Highcharts.Chart(hsoptions);
                 });
-                
             }
         };
         data = build_graphite_options(options, true);
