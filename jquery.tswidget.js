@@ -726,10 +726,12 @@ function find_definition (target_graphite, options) {
                             window.location = "/inspect/" + q;
                         }
                     },
-                    name: options.legend.labelFormatter(target.name),
                     type: "line",
                     animation: false
                 };
+                if (options.legend && options.legend.labelFormatter) {
+                    hstarget.name = options.legend.labelFormatter(target.name);
+                }
                 hstarget.graphite_metric = target.graphite_metric;
                 if (options["series"] && options["series"].stack) {
                     hstarget.type = "area";
