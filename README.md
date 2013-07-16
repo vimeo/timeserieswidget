@@ -2,12 +2,13 @@
 
 Plugin to easily make *highly interactive* time series (graphite) graph objects.
 (i.e. graphs where you can interactively toggle on/off individual series, inspect datapoints, zoom in realtime, etc)
-Supports [Flot](http://www.flotcharts.org/) (canvas), [Rickshaw](http://code.shutterstock.com/rickshaw/) (svg) and
-standard graphite png images (in case you're nostalgic and don't like interactivity)
+Supports [Flot](http://www.flotcharts.org/) (canvas), [Rickshaw](http://code.shutterstock.com/rickshaw/) (svg), 
+[Highcharts](http://www.highcharts.com/) (svg) and standard graphite png images 
+(in case you're nostalgic and don't like interactivity)
 
 Goals:
 * easy to use, elegant but powerful api, aimed to cover all your graphite/time series graphing needs.
-* only abstract where it makes sense.  Graphite, Flot, and Rickshaw api's are awesome and powerfull, expose them
+* only abstract where it makes sense. Graphite, Flot, Highcharts and Rickshaw api's are awesome and powerfull, expose them
 * aim for some consistency in configuration across backends (to the extent possible and sane)
 * be very similar/compatible to the existing graphite API (but extended for interactivity features)
 * provide all interactive features you would expect; so that all graphite dashboards can rely on the same
@@ -22,11 +23,13 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <th>PNG</th>
     <th>Flot</th>
     <th>Rickshaw</th>
+    <th>Highcharts</th>
 </tr>
 <tr>
     <td>description</td>
     <td>Static PNG images rendered by graphite server</td>
     <td>Interactive client-side rendering using canvas</td>
+    <td>Interactive client-side rendering using SVG</td>
     <td>Interactive client-side rendering using SVG</td>
 </tr>
 <tr>
@@ -34,11 +37,13 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>quite fast</td>
     <td>quite fast.  interactive features near-realtime</td>
     <td>slow with many datapoints and/or multiple graphs (needs better <a href="https://github.com/graphite-project/graphite-web/issues/153">graphite consolidation</a>)</td>
+    <td>TODO</td>
 </tr>
 <tr>
     <td>hover over datapoints/graph -> popup with exact data</td>
     <td>NA</td>
     <td>Y (<a href="https://github.com/flot/flot/pull/867">flot #867</a> would make it a bit better)</td>
+    <td>Y</td>
     <td>Y</td>
 </tr>
 <tr>
@@ -46,23 +51,27 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>NA</td>
     <td>Y</td>
     <td>WIP</td>
+    <td>N</td>
 </tr>
 <tr>
     <td>interactive zooming</td>
     <td>NA</td>
     <td>Y</td>
     <td>WIP</td>
+    <td>Y</td>
 </tr>
 <tr>
     <td>interactive panning</td>
     <td>NA</td>
     <td>WIP</td>
     <td>WIP</td>
+    <td>N</td>
 </tr>
 <tr>
     <td>hover over legend -> hilight on plot</td>
     <td>NA</td>
     <td>WIP</td>
+    <td>Y</td>
     <td>Y</td>
 </tr>
 <tr>
@@ -70,6 +79,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>NA</td>
     <td>WIP</td>
     <td>Y</td>
+    <td>TODO</td>
 </tr>
 <tr>
     <td>toggling targets on/off</td>
@@ -78,10 +88,12 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
              <a href="https://github.com/flot/flot/issues/869">flot pull 869</a>,
              <a href="https://github.com/vimeo/timeserieswidget/tree/flot-legend-toggle">branch flot-legend-toggle</a>)</td>
     <td>Y</td>
+    <td>Y</td>
 </tr>
 <tr>
     <td>toggling between line vs stack (band) mode</td>
     <td>NA</td>
+    <td>Y</td>
     <td>Y</td>
     <td>Y</td>
 </tr>
@@ -90,6 +102,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>NA</td>
     <td>NA</td>
     <td>WIP</td>
+    <td>Y</td>
 </tr>
 <tr>
     <td>notes</td>
@@ -97,6 +110,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     you could actually implement interactive features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
     <td></td>
     <td>more "generic" (based on D3), all data is accessible in DOM and themeable with CSS</td>
+    <td>Licensing: Free for non commercial (http://www.highcharts.com/license)</td>
 </tr>
 </table>
 
@@ -234,5 +248,5 @@ for targets but presumably other things as well:
 * rickshaw supports a few things, but for hex codes, it requires the '#'
 
 ## Some clientside specific options
-* may set or override flot/rickshaw-specific options (such as grid, legend, ...) if you've set them. 
+* may set or override flot/rickshaw-specific options (such as grid, legend, ...) if you've set them.
   this should rarely be a problem, consult the code and grep for the feature if you want to know more.
