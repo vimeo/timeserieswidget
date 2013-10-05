@@ -293,11 +293,13 @@ function find_definition (target_graphite, options) {
                 // although they still look more intense than in graphite though.
                 // tuning tickLength doesn't seem to help (and no lineWidth for axis..). maybe a graphite bug
                 options['tickColor'] = options['minorLine'];
-                options['xaxis'] = { color: options['fgcolor'], tickColor: options['tickColor'], mode: 'time'};
+                options['xaxis'] = options['xaxis'] || {};
+                $.extend(options['xaxis'], { color: options['fgcolor'], tickColor: options['tickColor'], mode: 'time'});
                 if ('tz' in options) {
                     options['xaxis']['timezone'] = options['tz'];
                 }
-                options['yaxis'] = { color: options['fgcolor'], tickColor: options['tickColor'], tickFormatter: suffixFormatterSI};
+                options['yaxis'] = options['yaxis'] || {};
+                $.extend(options['yaxis'], { color: options['fgcolor'], tickColor: options['tickColor'], tickFormatter: suffixFormatterSI});
                 if('suffixes' in options) {
                     if(options['suffixes'] == 'binary') {
                         options['yaxis']['tickFormatter'] = suffixFormatterBinary;
