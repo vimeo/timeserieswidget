@@ -253,7 +253,7 @@ function find_definition (target_graphite, options) {
             if(!('states' in options)) {
                 options['states'] = {};
             }
-            options['states'] = $.extend(options['states'], states);
+            $.extend(options['states'], states);
 
             function suffixFormatterSI(val, axis) {
                 range = axis.max - axis.min;
