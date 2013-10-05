@@ -44,9 +44,9 @@ function build_graphite_options(options, raw) {
                         // so we need a good string identifier and set it using alias() (which graphite will honor)
                         // so that we recognize the returned output. simplest is just to include the target spec again
                         // though this duplicates a lot of info in the url.
-                        clean_options.push("target=alias(" + encodeURIComponent(value.target) + ",'" + value.target +"')");
+                        clean_options.push("target=alias(" + encodeURIComponent(value.target) + ",'" + encodeURIComponent(value.target) +"')");
                     } else {
-                        clean_options.push("target=alias(color(" +encodeURIComponent(value.target + ",'" + value.color) +"'),'" + value.name +"')");
+                        clean_options.push("target=alias(color(" +encodeURIComponent(value.target + ",'" + value.color) +"'),'" + encodeURIComponent(value.name) +"')");
                     }
             });
         } else if (value !== null) {
@@ -731,6 +731,9 @@ function find_definition (target_graphite, options) {
                 };
                 if (options.legend && options.legend.labelFormatter) {
                     hstarget.name = options.legend.labelFormatter(target.name);
+                    // Forbid anchor tags because it will break ability to
+                    // hide/show series.
+                    hstarget.name = hstarget.name.replace(/<\/?a[^>]*?>/ig, "");
                 }
                 hstarget.graphite_metric = target.graphite_metric;
                 if (options["series"] && options["series"].stack) {
