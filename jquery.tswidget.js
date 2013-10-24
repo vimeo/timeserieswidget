@@ -606,6 +606,9 @@ function find_definition (target_graphite, options) {
         $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
+
+        options['xAxis'] = options['xAxis'] || {};
+        options['yAxis'] = options['yAxis'] || {};
         var drawHighcharts = function(resp_graphite) {
             var hsoptions = {
                 chart: {
@@ -665,7 +668,7 @@ function find_definition (target_graphite, options) {
                         color: options.fgcolor
                     }
                 },
-                xAxis: {
+                xAxis: $.extend({},{
                     type: 'datetime',
                     tickPixelInterval: 50,
                     labels: {
@@ -677,8 +680,8 @@ function find_definition (target_graphite, options) {
                     maxPadding: 0.01,
                     minPadding: 0.01,
                     gridLineWidth: 0.2
-                },
-                yAxis: {
+                }, options['xAxis']),
+                yAxis: $.extend({},{
                     gridLineColor: 'rgba(255, 255, 255, .3)',
                     minorGridLineColor: 'rgba(255,255,255,0.1)',
                     title: {
@@ -687,7 +690,7 @@ function find_definition (target_graphite, options) {
                     },
                     maxPadding: 0.01,
                     minPadding: 0.01
-                },
+                }, options['yAxis']),
                 tooltip: {
                     enabled: options.hover_details,
                     crosshairs:[{width:1, color:'#ccc'},{width:1, color:'#ccc'}],
