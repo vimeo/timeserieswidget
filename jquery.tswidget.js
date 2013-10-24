@@ -607,9 +607,14 @@ function find_definition (target_graphite, options) {
         $div.height(options.height);
         $div.width(options.width);
 
-        options['xAxis'] = options['xAxis'] || {};
-        options['yAxis'] = options['yAxis'] || {};
         var drawHighcharts = function(resp_graphite) {
+            options['xAxis'] = options['xAxis'] || {};
+            options['yAxis'] = options['yAxis'] || {};
+
+            for (i = 0; i < options['targets'].length; i++ ) {
+                options['targets'][i]['color'] = options['targets'][i]['color'];
+            }
+
             var hsoptions = {
                 chart: {
                     renderTo: id,
@@ -714,6 +719,7 @@ function find_definition (target_graphite, options) {
                 },
                 series: []
             }; 
+
             for (var res_i = 0; res_i < resp_graphite.length; res_i++) {
                 var target = find_definition(resp_graphite[res_i], options);
                 var hstarget = {
@@ -736,6 +742,7 @@ function find_definition (target_graphite, options) {
                     options.legend = { enabled:!0, align:"center", layout:"horizontal", labelFormatter:function(name){return name} }
                 }
                 hstarget.name = options.legend.labelFormatter(target.name);
+                hstarget.color = target['color'];
                 hstarget.graphite_metric = target.graphite_metric;
                 if (options["series"] && options["series"].stack) {
                     hstarget.type = "area";
