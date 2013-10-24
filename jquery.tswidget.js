@@ -729,9 +729,10 @@ function find_definition (target_graphite, options) {
                     type: "line",
                     animation: false
                 };
-                if (options.legend && options.legend.labelFormatter) {
-                    hstarget.name = options.legend.labelFormatter(target.name);
+                if (!(options.legend && options.legend.labelFormatter)) {
+                    options.legend = { enabled:!0, align:"center", layout:"horizontal", labelFormatter:function(name){return name} }
                 }
+                hstarget.name = options.legend.labelFormatter(target.name);
                 hstarget.graphite_metric = target.graphite_metric;
                 if (options["series"] && options["series"].stack) {
                     hstarget.type = "area";
