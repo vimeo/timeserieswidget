@@ -79,7 +79,7 @@ function build_graphite_url(options) {
 }
 
 function build_anthracite_url(options) {
-    url = strip_ending_slash(options.anthracite_url) + '/events/jsonp';
+    url = strip_ending_slash(options.anthracite_url) + '/events/json';
     if ('events_query' in options) {
         url += '?q=' + options['events_query'];
     }
@@ -470,16 +470,11 @@ function find_definition (target_graphite, options) {
             requests.push($.ajax({
                 accepts: {text: 'application/json'},
                 cache: false,
-                dataType: 'jsonp',
-                jsonp: 'jsonp',
+                dataType: 'json',
                 url: anthracite_url,
                 success: function(data, textStatus, jqXHR ) { events = data.events },
-                // TODO: this won't be called for cross domain jsonp, i.e. for this
-                // errors just show up in the console
-                // see http://api.jquery.com/jQuery.ajax/
-                // so switch to plain json so that we can display errors nicely
                 error: function(xhr, textStatus, errorThrown) {
-                    on_error("Failed to do anthracite jsonp GET request to " + truncate_str(anthracite_url) +
+                    on_error("Failed to do anthracite GET request to " + truncate_str(anthracite_url) +
                            ": " + textStatus + ": " + errorThrown);
                 }
             }));
