@@ -5,6 +5,13 @@ function strip_ending_slash(str) {
     return str;
 }
 
+function truncate_str(str) {
+    if (str.length >= 147) {
+        return str.substring(0, 148) + "...";
+    }
+    return str
+}
+
 function build_graphite_options(options, raw) {
     raw = raw || false;
     var clean_options = [];
@@ -453,17 +460,28 @@ function find_definition (target_graphite, options) {
                 }
                 add_targets(data);
             },
-            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+            error: function(xhr, textStatus, errorThrown) {
+                on_error("Failed to do graphite POST request to " + truncate_str(options['graphite_url']) +
+                       ": " + textStatus + ": " + errorThrown);
+            }
         }));
         if('anthracite_url' in options){
+            anthracite_url = build_anthracite_url(options, true);
             requests.push($.ajax({
                 accepts: {text: 'application/json'},
                 cache: false,
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
-                url: build_anthracite_url(options, true),
+                url: anthracite_url,
                 success: function(data, textStatus, jqXHR ) { events = data.events },
-                error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+                // TODO: this won't be called for cross domain jsonp, i.e. for this
+                // errors just show up in the console
+                // see http://api.jquery.com/jQuery.ajax/
+                // so switch to plain json so that we can display errors nicely
+                error: function(xhr, textStatus, errorThrown) {
+                    on_error("Failed to do anthracite jsonp GET request to " + truncate_str(anthracite_url) +
+                           ": " + textStatus + ": " + errorThrown);
+                }
             }));
         }
         if('es_url' in options){
@@ -474,7 +492,10 @@ function find_definition (target_graphite, options) {
                 jsonp: 'json',
                 url: options['es_url'],
                 success: function(data, textStatus, jqXHR ) { es_events = data.hits.hits },
-                error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+                error: function(xhr, textStatus, errorThrown) {
+                    on_error("Failed to do elasticsearch request to " + truncate_str(options['es_url']) +
+                           ": " + textStatus + ": " + errorThrown);
+                }
             }));
         }
 
@@ -597,7 +618,10 @@ function find_definition (target_graphite, options) {
             type: 'POST',
             data: data.join('&'),
             url: options['graphite_url'],
-            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+            error: function(xhr, textStatus, errorThrown) {
+                on_error("Failed to do graphite POST request to " + truncate_str(options['graphite_url']) +
+                       ": " + textStatus + ": " + errorThrown);
+            }
           }).done(drawRick);
     };
 
@@ -784,7 +808,10 @@ function find_definition (target_graphite, options) {
             url: options['graphite_url'],
             type: "POST",
             data: data.join('&'),
-            error: function(xhr, textStatus, errorThrown) { on_error(textStatus + ": " + errorThrown); }
+            error: function(xhr, textStatus, errorThrown) {
+                on_error("Failed to do graphite POST request to " + truncate_str(options['graphite_url']) +
+                       ": " + textStatus + ": " + errorThrown);
+            }
         }).done(drawHighcharts);
     };
     // Default settings. 
