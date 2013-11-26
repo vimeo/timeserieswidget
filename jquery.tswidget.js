@@ -233,14 +233,25 @@ function find_definition (target_graphite, options) {
                 var target = find_definition(response_data[res_i], options);
                 target.label = target.name; // flot wants 'label'
                 target.data = [];
-                if('drawNullAsZero' in options && options['drawNullAsZero']) {
-                    for (var i in response_data[res_i].datapoints) {
-                        target.data[i] = [response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0] || 0 ];
+                var nulls = 0;
+                var non_nulls = 0;
+                for (var i in response_data[res_i].datapoints) {
+                    if(response_data[res_i].datapoints[i][0] == null) {
+                        nulls++;
+                        if('drawNullAsZero' in options && options['drawNullAsZero']) {
+                            response_data[res_i].datapoints[i][0] = 0;
+                        } else {
+                            // don't tell flot about null values, it prevents adjacent non-null values from
+                            // being rendered correctly
+                            continue;
+                        }
+                    } else {
+                        non_nulls++;
                     }
-                } else {
-                    for (var i in response_data[res_i].datapoints) {
-                        target.data[i] = [response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0]];
-                    }
+                    target.data.push([response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0]]);
+                }
+                if (nulls/non_nulls > 0.3) {
+                    console.log("warning: rendered target contains " + nulls + " null values, " + non_nulls + " non_nulls");
                 }
                 all_targets.push(target);
             }
