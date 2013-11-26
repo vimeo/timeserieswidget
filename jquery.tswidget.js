@@ -231,7 +231,7 @@ function find_definition (target_graphite, options) {
         var add_targets = function(response_data) {
             for (var res_i = 0; res_i < response_data.length; res_i++) {
                 var target = find_definition(response_data[res_i], options);
-                target.label = target.name // flot wants 'label'
+                target.label = target.name; // flot wants 'label'
                 target.data = [];
                 if('drawNullAsZero' in options && options['drawNullAsZero']) {
                     for (var i in response_data[res_i].datapoints) {
@@ -246,7 +246,8 @@ function find_definition (target_graphite, options) {
             }
         }
 
-        var drawFlot = function() {
+        var drawFlot = function(es_data, anthracite_data) {
+
             // default config state modifiers (you can override them in your config objects)
             var states = {
                 'stacked': {
@@ -340,9 +341,10 @@ function find_definition (target_graphite, options) {
                 }
 
                 for (var i = 0; i < events.length; i++) {
-                    x = events[i].time * 1000;
+                    x = events[i].date * 1000;
                     options['grid']['markings'].push({ color: options['events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
                 }
+                // custom es_events loop
                 for (var i = 0; i < es_events.length; i++) {
                     x = Date.parse(es_events[i]['_source']['@timestamp']);
                     options['grid']['markings'].push({ color: options['es_events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
@@ -372,8 +374,8 @@ function find_definition (target_graphite, options) {
             });
             // add labels
             var o;
-            for (var i = 0; i < events.length; i++) {
-                o = plot.pointOffset({ x: events[i].time * 1000, y: 0});
+            /*for (var i = 0; i < events.length; i++) {
+                o = plot.pointOffset({ x: events[i].date * 1000, y: 0});
                 msg = '<div style="position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 35 ) + 'px;';
                 msg += 'color:' + options['events_text_color'] + ';font-size:smaller">';
                 msg += '<b>' + events[i].type + '</b></br>';
@@ -390,7 +392,7 @@ function find_definition (target_graphite, options) {
                 msg += "<b>msg</b>: " + es_events[i]['_source']['@message'] + '</br>';
                 msg += '</div>';
                 $div.append(msg);
-            }
+            }*/
             if (options['line_stack_toggle']) {
                 var form = document.getElementById(options['line_stack_toggle']);
                 if(options['state'] == 'stacked') {
@@ -472,7 +474,9 @@ function find_definition (target_graphite, options) {
                 cache: false,
                 dataType: 'json',
                 url: anthracite_url,
-                success: function(data, textStatus, jqXHR ) { events = data.events },
+                success: function(data, textStatus, jqXHR ) {
+                    events = data.events;
+                },
                 error: function(xhr, textStatus, errorThrown) {
                     on_error("Failed to do anthracite GET request to " + truncate_str(anthracite_url) +
                            ": " + textStatus + ": " + errorThrown);
@@ -494,7 +498,7 @@ function find_definition (target_graphite, options) {
             }));
         }
 
-        $.when.apply($, requests ).done(drawFlot);
+        $.when.apply($, requests).done(drawFlot);
     };
 
     $.fn.graphiteRick.render = function(div, options, on_error) {
