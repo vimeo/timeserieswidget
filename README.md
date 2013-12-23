@@ -108,7 +108,8 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>notes</td>
     <td>1999 called. they want their static images back.<br/>
     you could actually implement interactive features with a JS layer on top. (and some monitoring dashboards do this) but that is/would be soo slow)</td>
-    <td></td>
+    <td>doesn't treat null values very well. the code has to remove them, but if you use multiple targets and one of them has a lot of nulls (and hence removed datapoints)
+    the graph display will break, so you have to use drawNullAsZero to avoid that</td>
     <td>more "generic" (based on D3), all data is accessible in DOM and themeable with CSS</td>
     <td>Licensing: Free for non commercial (http://www.highcharts.com/license)</td>
 </tr>
