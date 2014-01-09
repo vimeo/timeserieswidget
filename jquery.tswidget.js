@@ -342,6 +342,10 @@ function find_definition (target_graphite, options) {
                     options['grid']['hoverable'] = true;
                     options['grid']['autoHighlight'] = true;  // show datapoint being hilighted. true by default but hardcode to make sure
                 }
+                if('on_click' in options) {
+                    options['grid']['clickable'] = true;
+                    // on_click is a callback, which we'll bind later on
+                }
                 if(!('markings' in options['grid'])) {
                     options['grid']['markings'] = [];
                 }
@@ -424,7 +428,7 @@ function find_definition (target_graphite, options) {
                     $.plot(div, all_targets, buildFlotOptions(options));
                 }, false);
             }
-           function showTooltip(x, y, contents) {
+            function showTooltip(x, y, contents) {
                 $("<div id='tooltip_" + id + "'>" + contents + "</div>").css({
                     position: "absolute",
                     display: "none",
@@ -436,27 +440,31 @@ function find_definition (target_graphite, options) {
                     opacity: 0.80
                 }).appendTo("body").fadeIn(200);
             }
-          var previousPoint = null;
-        $(div).bind("plothover", function (event, pos, item) {
-            if (item) {
-                if (previousPoint != item.dataIndex) {
-                    previousPoint = item.dataIndex;
-                    $("#tooltip_" + id).remove();
-                    var x = item.datapoint[0],
-                    y = item.datapoint[1].toFixed(2);
-                    var date = new Date(x);
-                    showTooltip(item.pageX, item.pageY,
+            var previousPoint = null;
+            $(div).bind("plotclick", function (event, pos, item) {
+                unix_timestamp = pos.x / 1000;
+                val = pos.y;
+                options['on_click'](item['series']['label'], unix_timestamp, val, event);
+            });
+            $(div).bind("plothover", function (event, pos, item) {
+                if (item) {
+                    if (previousPoint != item.dataIndex) {
+                        previousPoint = item.dataIndex;
+                        $("#tooltip_" + id).remove();
+                        var x = item.datapoint[0],
+                        y = item.datapoint[1].toFixed(2);
+                        var date = new Date(x);
+                        showTooltip(item.pageX, item.pageY,
                         "Series: " + item.series.label +
                         "<br/>Local Time: " + date.toLocaleString() +
                         "<br/>UTC Time: " + date.toUTCString() + ")" +
                         "<br/>Value: " + y);
+                    }
+                } else {
+                    $("#tooltip_" + id).remove();
+                    previousPoint = null;
                 }
-            } else {
-                $("#tooltip_" + id).remove();
-                previousPoint = null;
-            }
-        });
-
+            });
         }
         data = build_graphite_options(options, true);
         var requests = [];

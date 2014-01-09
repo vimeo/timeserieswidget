@@ -212,6 +212,8 @@ hover with mouse over graph datapoints to yield popups with information (series 
 when a tswidget feature maps directly to a native flot feature, or it doesn't work with rickshaw
 or just any option in the flot api (legend, grid, ...)
 
+you can set on_click to a callback that will be called when you click on a plot
+
 #### rickshaw specific
 
 when a tswidget feature maps directly to a native rickshaw feature, or it doesn't work with flot
