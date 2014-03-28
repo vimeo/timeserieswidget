@@ -327,10 +327,16 @@ function find_definition (target_graphite, options) {
                     }
                 }
                 if('title' in options) {
-                    options['xaxes'] = [{axisLabel: options['title']}];
+                    if(!options['xaxes']) {
+                      options['xaxes'] = [{}];
+                    }
+                    $.extend(options['xaxes'][0],{axisLabel: options['title']});
                 }
                 if('vtitle' in options) {
-                    options['yaxes'] = [{position: 'left', axisLabel: options['vtitle']}];
+                    if(!options['yaxes']) {
+                      options['yaxes'] = [{}];
+                    }
+                    $.extend(options['yaxes'][0], {position: 'left', axisLabel: options['vtitle']});
                 }
                 for (i = 0; i < options['targets'].length; i++ ) {
                     options['targets'][i]['color'] = options['targets'][i]['color'];
