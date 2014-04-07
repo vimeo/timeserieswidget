@@ -9,7 +9,7 @@ function truncate_str(str) {
     if (str.length >= 147) {
         return str.substring(0, 148) + "...";
     }
-    return str
+    return str;
 }
 
 function build_graphite_options(options, raw) {
@@ -87,7 +87,7 @@ function build_anthracite_url(options) {
 }
 
 function find_definition (target_graphite, options) {
-    var matching_i = undefined;
+    var matching_i;
     for (var cfg_i = 0; cfg_i < options.targets.length && matching_i == undefined; cfg_i++) {
         // string match (no globbing)
         if(options.targets[cfg_i].target == target_graphite.target) {
@@ -98,7 +98,7 @@ function find_definition (target_graphite, options) {
             matching_i = cfg_i;
         }
     }
-    if (matching_i == undefined) {
+    if (matching_i === undefined) {
         console.error ("internal error: could not figure out which target_option target_graphite '" +
                 target_graphite.target + "' comes from");
         return [];
@@ -128,12 +128,12 @@ function find_definition (target_graphite, options) {
         'fgcolor' : '#ffffff',  // title, legend text, and axis labels
         'majorLine': '#ffffff',
         'minorLine': '#afafaf'
-    }
+    };
     var default_tswidget_options = {
         'events_color': '#ccff66',
         'es_events_color': '#ff0066',
         'events_text_color': '#5C991F'
-    }
+    };
 
     $.fn.graphite = function (options) {
         if (options === "update") {
@@ -221,43 +221,52 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphiteFlot.render = function(div, options, on_error) {
-        var id = div.getAttribute('id');
+
         $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
-        var events = [];
-        var es_events = [];
-        var all_targets = [];
-        var add_targets = function(response_data) {
-            for (var res_i = 0; res_i < response_data.length; res_i++) {
-                var target = find_definition(response_data[res_i], options);
-                target.label = target.name; // flot wants 'label'
-                target.data = [];
-                var nulls = 0;
-                var non_nulls = 0;
-                for (var i in response_data[res_i].datapoints) {
-                    if(response_data[res_i].datapoints[i][0] == null) {
-                        nulls++;
-                        if('drawNullAsZero' in options && options['drawNullAsZero']) {
-                            response_data[res_i].datapoints[i][0] = 0;
-                        } else {
-                            // don't tell flot about null values, it prevents adjacent non-null values from
-                            // being rendered correctly
-                            continue;
-                        }
-                    } else {
-                        non_nulls++;
-                    }
-                    target.data.push([response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0]]);
-                }
-                if (nulls/non_nulls > 0.3) {
-                    console.log("warning: rendered target contains " + nulls + " null values, " + non_nulls + " non_nulls");
-                }
-                all_targets.push(target);
-            }
-        }
 
-        var drawFlot = function(es_data, anthracite_data) {
+        var id = div.getAttribute('id'),
+            events = [],
+            es_events = [],
+            all_targets = [],
+            min_date = null,
+            max_date = null,
+            add_targets = function(response_data) {
+
+                // store min and max X value to be able to get time range for event values
+                min_date = response_data[0].datapoints[0][1];
+                max_date = response_data[0].datapoints[response_data[0].datapoints.length - 1][1];
+
+                for (var res_i = 0; res_i < response_data.length; res_i++) {
+                    var target = find_definition(response_data[res_i], options);
+                    target.label = target.name; // flot wants 'label'
+                    target.data = [];
+                    var nulls = 0;
+                    var non_nulls = 0;
+                    for (var i in response_data[res_i].datapoints) {
+                        if(response_data[res_i].datapoints[i][0] == null) {
+                            nulls++;
+                            if('drawNullAsZero' in options && options['drawNullAsZero']) {
+                                response_data[res_i].datapoints[i][0] = 0;
+                            } else {
+                                // don't tell flot about null values, it prevents adjacent non-null values from
+                                // being rendered correctly
+                                continue;
+                            }
+                        } else {
+                            non_nulls++;
+                        }
+                        target.data.push([response_data[res_i].datapoints[i][1] * 1000, response_data[res_i].datapoints[i][0]]);
+                    }
+                    if (nulls/non_nulls > 0.3) {
+                        console.log("warning: rendered target contains " + nulls + " null values, " + non_nulls + " non_nulls");
+                    }
+                    all_targets.push(target);
+                }
+            };
+
+        var drawFlot = function() {
 
             // default config state modifiers (you can override them in your config objects)
             var states = {
@@ -269,6 +278,7 @@ function find_definition (target_graphite, options) {
                     'series': {'stack': null, 'lines': { 'show': true, 'lineWidth': 0.6, 'fill': false }}
                 }
             };
+
             if(!('states' in options)) {
                 options['states'] = {};
             }
@@ -301,6 +311,7 @@ function find_definition (target_graphite, options) {
                 return val.toFixed(axis.tickDecimals);
             }
 
+            var has_events_processed = false;
             var buildFlotOptions = function(options) {
                 // xaxis color = title color and horizontal lines in grid
                 // yaxis color = vtitle color and vertical lines in grid
@@ -355,19 +366,92 @@ function find_definition (target_graphite, options) {
                     };
                 }
 
-                for (var i = 0; i < events.length; i++) {
-                    x = events[i].date * 1000;
-                    options['grid']['markings'].push({ color: options['events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
+                if (!has_events_processed) {
+                    has_events_processed = true;
+                    _processEventsData();
                 }
-                // custom es_events loop
-                for (var i = 0; i < es_events.length; i++) {
-                    x = Date.parse(es_events[i]['_source']['@timestamp']);
-                    options['grid']['markings'].push({ color: options['es_events_color'], lineWidth: 1, xaxis: { from: x, to: x} });
+
+                if (es_events.length || events.length) {
+                    _addEventsYAxis(options);
                 }
+
                 state = options['state'] || 'lines';
                 return $.extend(options, options['states'][state]);
             }
+
+            var _addEventsYAxis = function(opts) {
+                var y_axes = [], init_y = $.extend({}, opts.yaxis);
+                y_axes.push(init_y, {
+                    min: 0,
+                    max: 1,
+                    show: false
+                });
+                opts.yaxes = y_axes;
+                delete opts.yaxis;
+            };
+
+            var _processEventsData = function() {
+                var anthracite_series = { 
+                        data: [],
+                        stack: 0,
+                        hoverable: true,
+                        clickable: true,
+                        lines: {
+                            show: false
+                        },
+                        bars: {
+                            barWidth: 1000 * 60,
+                            show: true,
+                            align: 'center',
+                            lineWidth: 1,
+                            fill: 1
+                        },
+                        yaxis: 2,
+                        label: JSON.stringify({ name: 'anthracite' })
+                    },
+                    es_series = {
+                        data: [],
+                        stack: 0,
+                        hoverable: true,
+                        clickable: true,
+                        lines: {
+                            show: false
+                        },
+                        bars: {
+                            show: true,
+                            barWidth: 1000 * 60,
+                            align: 'center',
+                            lineWidth: 1,
+                            fill: 1
+                        },
+                        yaxis: 2,
+                        label: JSON.stringify({ name: 'anthracite' })
+                    };
+
+                // anthracite events
+                for (var i = 0; i < events.length; i++) {
+                    x = events[i].date * 1000;
+                    anthracite_series.data.push([x,1]);
+                }
+
+                if (anthracite_series.data.length) {
+                    all_targets.push(anthracite_series);
+                }
+
+                // custom es_events loop
+                for (var i = 0; i < es_events.length; i++) {
+                    x = Date.parse(es_events[i]['_source']['@timestamp'] ?
+                            es_events[i]['_source']['@timestamp'] : es_events[i]['_source']['date'] );
+                    es_series.data.push([x,1]);
+                }
+
+                if (es_series.data.length) {
+                    all_targets.push(es_series);
+                }
+            };
+
             var plot = $.plot(div, all_targets, buildFlotOptions(options));
+
             $div.bind('plotselected', function (event, ranges) {
                 // clamp the zooming to prevent eternal zoom
 
@@ -387,27 +471,7 @@ function find_definition (target_graphite, options) {
                 zoomed_options['yaxis']['max'] = ranges.yaxis.to;
                 plot = $.plot(div, all_targets, zoomed_options);
             });
-            // add labels
-            var o;
-            /*for (var i = 0; i < events.length; i++) {
-                o = plot.pointOffset({ x: events[i].date * 1000, y: 0});
-                msg = '<div style="position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 35 ) + 'px;';
-                msg += 'color:' + options['events_text_color'] + ';font-size:smaller">';
-                msg += '<b>' + events[i].type + '</b></br>';
-                msg += events[i].desc
-                msg += '</div>';
-                $div.append(msg);
-            }
-            for (var i = 0; i < es_events.length; i++) {
-                o = plot.pointOffset({ x: Date.parse(es_events[i]['_source']['@timestamp']), y: 0});
-                msg = '<div style="background-color:#40FF00;position:absolute;left:' + (o.left) + 'px;top:' + ( o.top + 35 ) + 'px;';
-                msg += 'color:' + '#FF0066' + ';font-size:smaller">';
-                msg += '<b>tags</b>: ' + es_events[i]['_source']['@tags'].join(' ') + '</br>';
-                msg += "<b>env</b>: " + es_events[i]['_source']['@fields']['environment'] + '</br>';
-                msg += "<b>msg</b>: " + es_events[i]['_source']['@message'] + '</br>';
-                msg += '</div>';
-                $div.append(msg);
-            }*/
+
             if (options['line_stack_toggle']) {
                 var form = document.getElementById(options['line_stack_toggle']);
                 if(options['state'] == 'stacked') {
@@ -428,46 +492,80 @@ function find_definition (target_graphite, options) {
                     $.plot(div, all_targets, buildFlotOptions(options));
                 }, false);
             }
-            function showTooltip(x, y, contents) {
-                $("<div id='tooltip_" + id + "'>" + contents + "</div>").css({
+            
+            var over_tooltip = false,
+                $tooltip = $('<div/>', {
+                    id: 'tooltip_' + id
+                }).css({
                     position: "absolute",
                     display: "none",
-                    top: y + 5,
-                    left: x + 5,
+                    top: 0,
+                    left: 0,
                     border: "1px solid #fdd",
                     padding: "2px",
                     "background-color": "#fee",
                     opacity: 0.80
-                }).appendTo("body").fadeIn(200);
+                }).appendTo('body');
+
+            $tooltip.on('mouseenter', function() {
+                over_tooltip = true;
+                $tooltip.on('mouseleave', function() {
+                    over_tooltip = false;
+                    $tooltip.off('mouseleave');
+                });
+            });
+            
+            function showTooltip(x, y, contents) {
+                $tooltip.css({
+                    left: x + 5,
+                    top: y + 5
+                }).html(contents).fadeIn(200);
             }
-            var previousPoint = null;
+
             $(div).bind("plotclick", function (event, pos, item) {
                 unix_timestamp = pos.x / 1000;
                 val = pos.y;
                 options['on_click'](item['series']['label'], unix_timestamp, val, event);
             });
+
             $(div).bind("plothover", function (event, pos, item) {
-                if (item) {
-                    if (previousPoint != item.dataIndex) {
-                        previousPoint = item.dataIndex;
-                        $("#tooltip_" + id).remove();
-                        var x = item.datapoint[0],
-                        y = item.datapoint[1].toFixed(2);
-                        var date = new Date(x);
-                        showTooltip(item.pageX, item.pageY,
+
+                if (!item) {
+                    setTimeout(function() {
+                        if (!over_tooltip) {
+                            $tooltip.hide();
+                        }
+                    }, 500);
+                    return;
+                }
+
+                if (item.series.bars && item.series.bars.show) {
+                    var event_data = es_events[item.dataIndex],
+                        date = new Date(event_data._source.date);
+
+                    showTooltip(item.pageX, item.pageY,
+                        "Series: " + item.series.label +
+                        "<br/>Local Time: " + date.toLocaleString() +
+                        "<br/>UTC Time: " + date.toUTCString() + ")" +
+                        "<br/>Value: " + event_data._source.desc);
+                }
+                else {
+                    var x = item.datapoint[0],
+                    y = item.datapoint[1].toFixed(2);
+                    var date = new Date(x);
+                    showTooltip(item.pageX, item.pageY,
                         "Series: " + item.series.label +
                         "<br/>Local Time: " + date.toLocaleString() +
                         "<br/>UTC Time: " + date.toUTCString() + ")" +
                         "<br/>Value: " + y);
-                    }
-                } else {
-                    $("#tooltip_" + id).remove();
-                    previousPoint = null;
                 }
             });
         }
+
         data = build_graphite_options(options, true);
+
         var requests = [];
+
         requests.push($.ajax({
             accepts: {text: 'application/json'},
             cache: false,
@@ -486,6 +584,8 @@ function find_definition (target_graphite, options) {
                        ": " + textStatus + ": " + errorThrown);
             }
         }));
+
+        // TODO: look at anthracite api for time range options
         if('anthracite_url' in options){
             anthracite_url = build_anthracite_url(options, true);
             requests.push($.ajax({
@@ -502,22 +602,47 @@ function find_definition (target_graphite, options) {
                 }
             }));
         }
-        if('es_url' in options){
-            requests.push($.ajax({
-                accepts: {text: 'application/json'},
-                cache: false,
-                dataType: 'json',
-                jsonp: 'json',
-                url: options['es_url'],
-                success: function(data, textStatus, jqXHR ) { es_events = data.hits.hits },
-                error: function(xhr, textStatus, errorThrown) {
-                    on_error("Failed to do elasticsearch request to " + truncate_str(options['es_url']) +
-                           ": " + textStatus + ": " + errorThrown);
-                }
-            }));
-        }
 
-        $.when.apply($, requests).done(drawFlot);
+        var es_post;
+
+        if('es_url' in options){
+            es_post = function() {
+                $.ajax({
+                    type: 'POST',
+                    accepts: { text: 'application/json' },
+                    data: JSON.stringify({
+                        "query": {
+                            "bool": {
+                                "must": [{
+                                    "range": {
+                                        "event.date": {
+                                            "from":min_date * 1000,
+                                            "to":max_date * 1000
+                                        }
+                                    }
+                                }]
+                            }
+                        }, "from":0,"size":500}),
+                    cache: false,
+                    url: options['es_url'],
+                    success: function(data, textStatus, jqXHR ) {
+                        es_events = data.hits.hits;
+                        drawFlot();
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        on_error("Failed to do elasticsearch request to " + truncate_str(options['es_url']) +
+                               ": " + textStatus + ": " + errorThrown);
+                    }
+                });
+            }
+        }
+        
+        if (!es_post) {
+            $.when.apply($, requests).done(drawFlot);
+        }
+        else {
+            $.when.apply($, requests).then(es_post);
+        }
     };
 
     $.fn.graphiteRick.render = function(div, options, on_error) {
@@ -818,7 +943,9 @@ function find_definition (target_graphite, options) {
                 });
             }
         };
+
         data = build_graphite_options(options, true);
+
         $.ajax({
             accepts: {text: 'application/json'},
             cache: false,
@@ -832,6 +959,7 @@ function find_definition (target_graphite, options) {
             }
         }).done(drawHighcharts);
     };
+
     // Default settings. 
     // Override with the options argument for per-case setup
     // or set $.fn.graphite.defaults.<value> for global changes
