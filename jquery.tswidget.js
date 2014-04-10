@@ -78,14 +78,6 @@ function build_graphite_url(options) {
     return url.replace(/\?&/, "?");
 }
 
-function build_anthracite_url(options) {
-    url = strip_ending_slash(options.anthracite_url) + '/events/json';
-    if ('events_query' in options) {
-        url += '?q=' + options['events_query'];
-    }
-    return url;
-}
-
 function find_definition (target_graphite, options) {
     var matching_i;
     for (var cfg_i = 0; cfg_i < options.targets.length && matching_i == undefined; cfg_i++) {
@@ -228,7 +220,6 @@ function find_definition (target_graphite, options) {
 
         var id = div.getAttribute('id'),
             events = [],
-            es_events = [],
             all_targets = [],
             min_date = null,
             max_date = null,
@@ -371,7 +362,7 @@ function find_definition (target_graphite, options) {
                     _processEventsData();
                 }
 
-                if (es_events.length || events.length) {
+                if (events.length || events.length) {
                     _addEventsYAxis(options);
                 }
 
@@ -391,25 +382,10 @@ function find_definition (target_graphite, options) {
             };
 
             var _processEventsData = function() {
-                var anthracite_series = { 
-                        data: [],
-                        stack: 0,
-                        hoverable: true,
-                        clickable: true,
-                        lines: {
-                            show: false
-                        },
-                        bars: {
-                            barWidth: 1000 * 60,
-                            show: true,
-                            align: 'center',
-                            lineWidth: 1,
-                            fill: 1
-                        },
-                        yaxis: 2,
-                        label: JSON.stringify({ name: 'anthracite' })
-                    },
-                    es_series = {
+                var min_d = new Date(min_date * 1000),
+                    max_d = new Date(max_date * 1000),
+                    hours_span = Math.round((max_d - min_d) / 1000 / 60 / 60),
+                    event_series = {
                         data: [],
                         stack: 0,
                         hoverable: true,
@@ -419,7 +395,7 @@ function find_definition (target_graphite, options) {
                         },
                         bars: {
                             show: true,
-                            barWidth: 1000 * 60,
+                            barWidth: 1000 * 60 * (hours_span > 1 ? 1 / (hours_span * 0.5) : 1),
                             align: 'center',
                             lineWidth: 1,
                             fill: 1
@@ -429,24 +405,23 @@ function find_definition (target_graphite, options) {
                     };
 
                 // anthracite events
-                for (var i = 0; i < events.length; i++) {
+                /*for (var i = 0; i < events.length; i++) {
                     x = events[i].date * 1000;
                     anthracite_series.data.push([x,1]);
                 }
 
                 if (anthracite_series.data.length) {
                     all_targets.push(anthracite_series);
+                }*/
+
+                // events loop
+                for (var i = 0; i < events.length; i++) {
+                    x = Date.parse(events[i]._source.date);
+                    event_series.data.push([x,1]);
                 }
 
-                // custom es_events loop
-                for (var i = 0; i < es_events.length; i++) {
-                    x = Date.parse(es_events[i]['_source']['@timestamp'] ?
-                            es_events[i]['_source']['@timestamp'] : es_events[i]['_source']['date'] );
-                    es_series.data.push([x,1]);
-                }
-
-                if (es_series.data.length) {
-                    all_targets.push(es_series);
+                if (event_series.data.length) {
+                    all_targets.push(event_series);
                 }
             };
 
@@ -464,6 +439,7 @@ function find_definition (target_graphite, options) {
                 }
 
                 // do the zooming
+                // TODO: fix zooming with multiple axis, i.e. events rendered on the chart
                 zoomed_options = buildFlotOptions(options);
                 zoomed_options['xaxis']['min'] = ranges.xaxis.from;
                 zoomed_options['xaxis']['max'] = ranges.xaxis.to;
@@ -525,7 +501,9 @@ function find_definition (target_graphite, options) {
             $(div).bind("plotclick", function (event, pos, item) {
                 unix_timestamp = pos.x / 1000;
                 val = pos.y;
-                options['on_click'](item['series']['label'], unix_timestamp, val, event);
+                if (item && options.on_click && typeof options.on_click === 'function') {
+                    options.on_click(item['series']['label'], unix_timestamp, val, event);
+                }
             });
 
             $(div).bind("plothover", function (event, pos, item) {
@@ -540,7 +518,7 @@ function find_definition (target_graphite, options) {
                 }
 
                 if (item.series.bars && item.series.bars.show) {
-                    var event_data = es_events[item.dataIndex],
+                    var event_data = events[item.dataIndex],
                         date = new Date(event_data._source.date);
 
                     showTooltip(item.pageX, item.pageY,
@@ -564,7 +542,8 @@ function find_definition (target_graphite, options) {
 
         data = build_graphite_options(options, true);
 
-        var requests = [];
+        var requests = [],
+            es_post;
 
         requests.push($.ajax({
             accepts: {text: 'application/json'},
@@ -585,27 +564,7 @@ function find_definition (target_graphite, options) {
             }
         }));
 
-        // TODO: look at anthracite api for time range options
-        if('anthracite_url' in options){
-            anthracite_url = build_anthracite_url(options, true);
-            requests.push($.ajax({
-                accepts: {text: 'application/json'},
-                cache: false,
-                dataType: 'json',
-                url: anthracite_url,
-                success: function(data, textStatus, jqXHR ) {
-                    events = data.events;
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    on_error("Failed to do anthracite GET request to " + truncate_str(anthracite_url) +
-                           ": " + textStatus + ": " + errorThrown);
-                }
-            }));
-        }
-
-        var es_post;
-
-        if('es_url' in options){
+        if('events_url' in options){
             es_post = function() {
                 $.ajax({
                     type: 'POST',
@@ -624,13 +583,13 @@ function find_definition (target_graphite, options) {
                             }
                         }, "from":0,"size":500}),
                     cache: false,
-                    url: options['es_url'],
+                    url: options.events_url,
                     success: function(data, textStatus, jqXHR ) {
-                        es_events = data.hits.hits;
+                        events = data.hits.hits;
                         drawFlot();
                     },
                     error: function(xhr, textStatus, errorThrown) {
-                        on_error("Failed to do elasticsearch request to " + truncate_str(options['es_url']) +
+                        on_error("Failed to do elasticsearch request to " + truncate_str(options.events_url) +
                                ": " + textStatus + ": " + errorThrown);
                     }
                 });
@@ -641,7 +600,9 @@ function find_definition (target_graphite, options) {
             $.when.apply($, requests).done(drawFlot);
         }
         else {
-            $.when.apply($, requests).then(es_post);
+            $.when.apply($, requests).then(es_post, function() {
+                throw new Error();    
+            });
         }
     };
 
