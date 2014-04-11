@@ -183,23 +183,25 @@ function find_definition (target_graphite, options) {
     };
 
     $.fn.graphiteFlot = function (options, on_error) {
+
         if ('zoneFileBasePath' in options) {
-            timezoneJS.timezone.zoneFileBasePath = options['zoneFileBasePath'];
+            timezoneJS.timezone.zoneFileBasePath = options.zoneFileBasePath;
             timezoneJS.timezone.init();
         }
+
         options = options || {};
         var settings = $.extend({}, default_graphite_options, default_tswidget_options, $.fn.graphite.defaults, options);
 
         return this.each(function () {
-            $this = $(this);
-            $this.data("graphOptions", settings);
-            $.fn.graphiteFlot.render(this, settings, on_error);
+            $self = $(this);
+            $self.data("graphOptions", settings);
+            $.fn.graphiteFlot.render($self, settings, on_error);
         });
     };
 
     $.fn.graphiteHighcharts = function (options, on_error) {
         if ('zoneFileBasePath' in options) {
-            timezoneJS.timezone.zoneFileBasePath = options['zoneFileBasePath'];
+            timezoneJS.timezone.zoneFileBasePath = options.zoneFileBasePath;
             timezoneJS.timezone.init();
         }
         options = options || {};
@@ -212,13 +214,12 @@ function find_definition (target_graphite, options) {
         });
     };
 
-    $.fn.graphiteFlot.render = function(div, options, on_error) {
+    $.fn.graphiteFlot.render = function($div, options, on_error) {
 
-        $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
 
-        var id = div.getAttribute('id'),
+        var id = $div.attr('id'),
             events = [],
             all_targets = [],
             min_date = null,
@@ -271,9 +272,10 @@ function find_definition (target_graphite, options) {
             };
 
             if(!('states' in options)) {
-                options['states'] = {};
+                options.states = {};
             }
-            $.extend(options['states'], states);
+
+            $.extend(options.states, states);
 
             function suffixFormatterSI(val, axis) {
                 range = axis.max - axis.min;
@@ -366,8 +368,8 @@ function find_definition (target_graphite, options) {
                     _addEventsYAxis(options);
                 }
 
-                state = options['state'] || 'lines';
-                return $.extend(options, options['states'][state]);
+                state = options.state || 'lines';
+                return $.extend(options, options.states[state]);
             }
 
             var _addEventsYAxis = function(opts) {
@@ -384,7 +386,6 @@ function find_definition (target_graphite, options) {
             var _processEventsData = function() {
                 var min_d = new Date(min_date * 1000),
                     max_d = new Date(max_date * 1000),
-                    hours_span = Math.round((max_d - min_d) / 1000 / 60 / 60),
                     event_series = {
                         data: [],
                         stack: 0,
@@ -395,7 +396,7 @@ function find_definition (target_graphite, options) {
                         },
                         bars: {
                             show: true,
-                            barWidth: 1000 * 60 * (hours_span > 1 ? 1 / (hours_span * 0.5) : 1),
+                            barWidth: 1000 * 60,
                             align: 'center',
                             lineWidth: 1,
                             fill: 1
@@ -404,19 +405,9 @@ function find_definition (target_graphite, options) {
                         label: JSON.stringify({ name: 'anthracite' })
                     };
 
-                // anthracite events
-                /*for (var i = 0; i < events.length; i++) {
-                    x = events[i].date * 1000;
-                    anthracite_series.data.push([x,1]);
-                }
-
-                if (anthracite_series.data.length) {
-                    all_targets.push(anthracite_series);
-                }*/
-
                 // events loop
                 for (var i = 0; i < events.length; i++) {
-                    x = Date.parse(events[i]._source.date);
+                    x = events[i].fields.date;
                     event_series.data.push([x,1]);
                 }
 
@@ -425,7 +416,7 @@ function find_definition (target_graphite, options) {
                 }
             };
 
-            var plot = $.plot(div, all_targets, buildFlotOptions(options));
+            var plot = $.plot($div[0], all_targets, buildFlotOptions(options));
 
             $div.bind('plotselected', function (event, ranges) {
                 // clamp the zooming to prevent eternal zoom
@@ -439,13 +430,20 @@ function find_definition (target_graphite, options) {
                 }
 
                 // do the zooming
-                // TODO: fix zooming with multiple axis, i.e. events rendered on the chart
-                zoomed_options = buildFlotOptions(options);
-                zoomed_options['xaxis']['min'] = ranges.xaxis.from;
-                zoomed_options['xaxis']['max'] = ranges.xaxis.to;
-                zoomed_options['yaxis']['min'] = ranges.yaxis.from;
-                zoomed_options['yaxis']['max'] = ranges.yaxis.to;
-                plot = $.plot(div, all_targets, zoomed_options);
+                zoom_opts = buildFlotOptions(options);
+                zoom_opts.xaxis.min = ranges.xaxis.from;
+                zoom_opts.xaxis.max = ranges.xaxis.to;
+
+                if (zoom_opts.yaxis) {
+                    zoom_opts.yaxis.min = ranges.yaxis.from;
+                    zoom_opts.yaxis.max = ranges.yaxis.to;
+                }
+                else if (zoom_opts.yaxes) {
+                    zoom_opts.yaxes[0].min = ranges.yaxis.from;
+                    zoom_opts.yaxes[0].max = ranges.yaxis.to;
+                }
+
+                plot = $.plot($div[0], all_targets, zoom_opts);
             });
 
             if (options['line_stack_toggle']) {
@@ -465,7 +463,7 @@ function find_definition (target_graphite, options) {
                 form.addEventListener('change', function(e) {
                     var mode = e.target.value;
                     options['state'] = mode;
-                    $.plot(div, all_targets, buildFlotOptions(options));
+                    $.plot($div[0], all_targets, buildFlotOptions(options));
                 }, false);
             }
             
@@ -498,7 +496,7 @@ function find_definition (target_graphite, options) {
                 }).html(contents).fadeIn(200);
             }
 
-            $(div).bind("plotclick", function (event, pos, item) {
+            $div.bind("plotclick", function (event, pos, item) {
                 unix_timestamp = pos.x / 1000;
                 val = pos.y;
                 if (item && options.on_click && typeof options.on_click === 'function') {
@@ -506,7 +504,7 @@ function find_definition (target_graphite, options) {
                 }
             });
 
-            $(div).bind("plothover", function (event, pos, item) {
+            $div.bind("plothover", function (event, pos, item) {
 
                 if (!item) {
                     setTimeout(function() {
@@ -519,13 +517,13 @@ function find_definition (target_graphite, options) {
 
                 if (item.series.bars && item.series.bars.show) {
                     var event_data = events[item.dataIndex],
-                        date = new Date(event_data._source.date);
+                        date = new Date(event_data.fields.date);
 
                     showTooltip(item.pageX, item.pageY,
                         "Series: " + item.series.label +
                         "<br/>Local Time: " + date.toLocaleString() +
                         "<br/>UTC Time: " + date.toUTCString() + ")" +
-                        "<br/>Value: " + event_data._source.desc);
+                        "<br/>Value: " + event_data.fields.desc);
                 }
                 else {
                     var x = item.datapoint[0],
@@ -570,7 +568,7 @@ function find_definition (target_graphite, options) {
                     type: 'POST',
                     accepts: { text: 'application/json' },
                     data: JSON.stringify({
-                        "query": {
+                        query: {
                             "bool": {
                                 "must": [{
                                     "range": {
@@ -581,7 +579,16 @@ function find_definition (target_graphite, options) {
                                     }
                                 }]
                             }
-                        }, "from":0,"size":500}),
+                        }, 
+                        fields: ['desc', 'tags'],
+                        script_fields: {
+                            "date": {
+                                "script": "doc.date.value"
+                            }
+                        },
+                        from: 0,
+                        size: 500
+                    }),
                     cache: false,
                     url: options.events_url,
                     success: function(data, textStatus, jqXHR ) {
