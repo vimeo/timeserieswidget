@@ -370,7 +370,7 @@ function find_definition (target_graphite, options) {
 
                 state = options.state || 'lines';
                 return $.extend(options, options.states[state]);
-            }
+            };
 
             var _addEventsYAxis = function(opts) {
                 var y_axes = [], init_y = $.extend({}, opts.yaxis);
@@ -386,6 +386,7 @@ function find_definition (target_graphite, options) {
             var _processEventsData = function() {
                 var min_d = new Date(min_date * 1000),
                     max_d = new Date(max_date * 1000),
+                    hours_span = Math.round((max_d - min_d) / 1000 / 60 / 60),
                     event_series = {
                         data: [],
                         stack: 0,
@@ -410,6 +411,8 @@ function find_definition (target_graphite, options) {
                     x = events[i].fields.date;
                     event_series.data.push([x,1]);
                 }
+
+                // TODO: configure barWidth dependent upon amount of events and time span
 
                 if (event_series.data.length) {
                     all_targets.push(event_series);
