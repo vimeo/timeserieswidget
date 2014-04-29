@@ -47,7 +47,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>Y</td>
 </tr>
 <tr>
-    <td>events with annotations (using [anthracite](https://github.com/Dieterbe/anthracite/))</td>
+    <td>events with annotations (using <a href="https://github.com/Dieterbe/anthracite/">anthracite</a>)</td>
     <td>NA</td>
     <td>Y</td>
     <td>WIP</td>
@@ -196,6 +196,8 @@ events_url
 events_query
 ```
 show events from Elasticsearch (via [anthracite](https://github.com/Dieterbe/anthracite/), logstash or others).  Using the events_query you can narrow it down.
+The query format is explained [here](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html).
+In particular '*' means all, '' means none
 
 ```
 line_stack_toggle: 'line_stack_form_flot',

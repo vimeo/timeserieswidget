@@ -575,10 +575,15 @@ function find_definition (target_graphite, options) {
         }));
 
         if('events_url' in options){
-            if('events_query' in options && options['events_query'] != "") {
+            events_query = "*";  // this will internally map to Lucene MatchAllDocsQuery, which is efficient
+            if('events_query' in options) {
                 events_query = options['events_query'];
-            } else {
-                events_query = "*"  // this will internally map to Lucene MatchAllDocsQuery, which is efficient
+            }
+            // if 'events_query' is "", it'll return no docs
+            // see http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_empty_query
+            // this is a useful feature you can leverage. but doesn't work with ES <1.0 or so, so we do this for now:
+            if(events_query == "") {
+                events_query = "pleasedontmatchanythingggggprettysurethiswontmatchanything";
             }
 
             es_post = function() {
