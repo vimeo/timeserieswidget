@@ -47,7 +47,7 @@ NA = not available (can't be done to my knowledge), WIP = work in progress (shou
     <td>Y</td>
 </tr>
 <tr>
-    <td>events with annotations (using anthracite)</td>
+    <td>events with annotations (using [anthracite](https://github.com/Dieterbe/anthracite/))</td>
     <td>NA</td>
     <td>Y</td>
     <td>WIP</td>
@@ -192,10 +192,10 @@ the code, and it works with either the flot or rickshaw backend.
 automatically show large numbers using a prefix.  like graphite does, but configurable
 
 ```
-anthracite_url
-es_url
+events_url
+events_query
 ```
-show events from anthracite and/or elasticSearch (logstash) datasource.
+show events from Elasticsearch (via [anthracite](https://github.com/Dieterbe/anthracite/), logstash or others).  Using the events_query you can narrow it down.
 
 ```
 line_stack_toggle: 'line_stack_form_flot',

@@ -566,23 +566,34 @@ function find_definition (target_graphite, options) {
         }));
 
         if('events_url' in options){
+            if('events_query' in options && options['events_query'] != "") {
+                events_query = options['events_query'];
+            } else {
+                events_query = "*"  // this will internally map to Lucene MatchAllDocsQuery, which is efficient
+            }
+
             es_post = function() {
                 $.ajax({
                     type: 'POST',
                     accepts: { text: 'application/json' },
                     data: JSON.stringify({
                         query: {
-                            "bool": {
-                                "must": [{
-                                    "range": {
+                            filtered: {
+                                query: {
+                                    query_string: {
+                                        query: events_query
+                                    }
+                                },
+                                filter: {
+                                    range: {
                                         "event.date": {
-                                            "from":min_date * 1000,
-                                            "to":max_date * 1000
+                                            from: min_date * 1000,
+                                            to: max_date * 1000
                                         }
                                     }
-                                }]
+                                }
                             }
-                        }, 
+                        },
                         fields: ['desc', 'tags'],
                         script_fields: {
                             "date": {
