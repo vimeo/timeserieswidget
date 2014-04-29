@@ -387,6 +387,15 @@ function find_definition (target_graphite, options) {
                 var min_d = new Date(min_date * 1000),
                     max_d = new Date(max_date * 1000),
                     hours_span = Math.round((max_d - min_d) / 1000 / 60 / 60),
+                    // 180s looks pretty good for a 24h period
+                    max_width_based_on_span = hours_span * 7.5;
+                    // 180s looks good if we don't have too many of them
+                    max_width_based_on_number_events = 180;
+                    if(events.length > 10) {
+                        max_width_based_on_number_events = 1800 / events.length;
+                    }
+                    // the actual width which will be whichever is the more permissive one
+                    // in seconds
                     event_series = {
                         data: [],
                         stack: 0,
@@ -397,7 +406,7 @@ function find_definition (target_graphite, options) {
                         },
                         bars: {
                             show: true,
-                            barWidth: 1000 * 60,
+                            barWidth: Math.max(max_width_based_on_number_events, max_width_based_on_span) * 1000,
                             align: 'center',
                             lineWidth: 1,
                             fill: 1
