@@ -192,13 +192,13 @@ the code, and it works with either the flot or rickshaw backend.
 automatically show large numbers using a prefix.  like graphite does, but configurable
 
 ```
-events_url
-events_query
+events_url     http://elasticsearch-machine:9200/index/_search (set this to enable events)
+anthracite_url http://anthracite-machine/events/view (optional)
+events_query   (optional. defaults to '*' (all docs). '' means no docs)
 ```
 show events from Elasticsearch (via [anthracite](https://github.com/Dieterbe/anthracite/), logstash or others).  Using the events_query you can narrow it down.
 The query format is explained [here](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html).
-In particular '*' means all, '' means none
-
+anthracite_url enables view/edit links to view/edit anthracite events.
 ```
 line_stack_toggle: 'line_stack_form_flot',
 state: 'stacked',

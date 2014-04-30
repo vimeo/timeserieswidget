@@ -542,13 +542,18 @@ function find_definition (target_graphite, options) {
                 if (item.series.bars && item.series.bars.show) {
                     var event_data = events[item.dataIndex],
                         date = new Date(event_data.fields.date);
-
-                    showTooltip(item.pageX, item.pageY,
-                        "Series: " + item.series.label +
+                    tooltip_html = "Series: " + item.series.label +
                         "<br/>Local Time: " + date.toLocaleString() +
-                        "<br/>UTC Time: " + date.toUTCString() + ")" +
-                        "<br/>Desc: " + event_data.fields.desc +
-                        "<br/>Tags: " + event_data.fields.tags);
+                        "<br/>UTC Time: " + date.toUTCString() +
+                        "<br/><br/><p>" + event_data.fields.desc + "</p>" +
+                        "Tags: " + event_data.fields.tags;
+                    if ('anthracite_url' in options) {
+                        view_url = options['anthracite_url'] + "/events/view/" + event_data._id;
+                        edit_url = options['anthracite_url'] + "/events/edit/" + event_data._id;
+                        tooltip_html += "<br/> - <a href='" + view_url + "'>inspect</a> - " +
+                            "<a href='" + edit_url + "'>edit</a>";
+                    }
+                    showTooltip(item.pageX, item.pageY, tooltip_html);
                 }
                 else {
                     var x = item.datapoint[0],
@@ -557,7 +562,7 @@ function find_definition (target_graphite, options) {
                     showTooltip(item.pageX, item.pageY,
                         "Series: " + item.series.label +
                         "<br/>Local Time: " + date.toLocaleString() +
-                        "<br/>UTC Time: " + date.toUTCString() + ")" +
+                        "<br/>UTC Time: " + date.toUTCString() +
                         "<br/>Value: " + y);
                 }
             });
