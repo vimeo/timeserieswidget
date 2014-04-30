@@ -401,12 +401,12 @@ function find_definition (target_graphite, options) {
                         width = 0.083 * span / events.length;
                     }
                     // however, if there's not a lot of events, we don't want the width to become absurdly big.
-                    // "definitely big enough" is 30min in a 24h interval
+                    // "big enough" is 15min in a 24h interval
                     // max_width = Y * span
                     // Y = max_width/span
-                    // Y = 30*60 / 24*60*60
-                    // Y = 0.021
-                    max_width = 0.021 * span;
+                    // Y = 15*60 / 24*60*60
+                    // Y = 0.01
+                    max_width = 0.01 * span;
                     width = Math.min(width, max_width);
                     event_series = {
                         data: [],
