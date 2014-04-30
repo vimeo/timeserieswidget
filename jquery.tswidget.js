@@ -547,7 +547,8 @@ function find_definition (target_graphite, options) {
                         "Series: " + item.series.label +
                         "<br/>Local Time: " + date.toLocaleString() +
                         "<br/>UTC Time: " + date.toUTCString() + ")" +
-                        "<br/>Value: " + event_data.fields.desc);
+                        "<br/>Desc: " + event_data.fields.desc +
+                        "<br/>Tags: " + event_data.fields.tags);
                 }
                 else {
                     var x = item.datapoint[0],
