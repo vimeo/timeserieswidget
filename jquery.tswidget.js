@@ -386,16 +386,28 @@ function find_definition (target_graphite, options) {
             var _processEventsData = function() {
                 var min_d = new Date(min_date * 1000),
                     max_d = new Date(max_date * 1000),
-                    hours_span = Math.round((max_d - min_d) / 1000 / 60 / 60),
-                    // 180s looks pretty good for a 24h period
-                    max_width_based_on_span = hours_span * 7.5;
-                    // 180s looks good if we don't have too many of them
-                    max_width_based_on_number_events = 180;
-                    if(events.length > 10) {
-                        max_width_based_on_number_events = 1800 / events.length;
+                    span = Math.round((max_d - min_d) / 1000 ); // in seconds
+                    // the ideal width in s (big enough so you can click it, small enough so they don't annoy)
+                    // what looks about right, is 360s for a 24h period and no more than 20 events,
+                    // and should be wider if period is more, but smaller the more events we have.
+                    // so in other words:
+                    // width = X * (span/num_events)
+                    // X = (width * num_events) / span
+                    // X = 360 * 20 / 24*60*60
+                    // X = 0.083
+                    if(events.length == 0) {
+                        width = 0;
+                    } else {
+                        width = 0.083 * span / events.length;
                     }
-                    // the actual width which will be whichever is the more permissive one
-                    // in seconds
+                    // however, if there's not a lot of events, we don't want the width to become absurdly big.
+                    // "definitely big enough" is 30min in a 24h interval
+                    // max_width = Y * span
+                    // Y = max_width/span
+                    // Y = 30*60 / 24*60*60
+                    // Y = 0.021
+                    max_width = 0.021 * span;
+                    width = Math.min(width, max_width);
                     event_series = {
                         data: [],
                         stack: 0,
@@ -406,7 +418,7 @@ function find_definition (target_graphite, options) {
                         },
                         bars: {
                             show: true,
-                            barWidth: Math.max(max_width_based_on_number_events, max_width_based_on_span) * 1000,
+                            barWidth: width * 1000,
                             align: 'center',
                             lineWidth: 1,
                             fill: 1
