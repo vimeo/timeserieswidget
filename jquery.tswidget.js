@@ -609,7 +609,7 @@ function find_definition (target_graphite, options) {
 
         if (options.events_url) {
             events_query = "*";  // this will internally map to Lucene MatchAllDocsQuery, which is efficient
-            if(options.events_query) {
+            if('events_query' in options) {
                 events_query = options.events_query;
             }
             // if 'events_query' is "", it'll return no docs
