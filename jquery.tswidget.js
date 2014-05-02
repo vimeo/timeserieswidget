@@ -309,7 +309,6 @@ function find_definition (target_graphite, options) {
                 return val.toFixed(axis.tickDecimals);
             }
 
-            var has_events_processed = false;
             var buildFlotOptions = function(options) {
                 // xaxis color = title color and horizontal lines in grid
                 // yaxis color = vtitle color and vertical lines in grid
@@ -364,14 +363,11 @@ function find_definition (target_graphite, options) {
                     };
                 }
 
-                if (!has_events_processed) {
-                    has_events_processed = true;
-                    _processEventsData();
-                }
-
                 if (events.length || events.length) {
                     _addEventsYAxis(options);
                 }
+
+                _processEventsData();
 
                 state = options.state || 'lines';
                 return $.extend(options, options.states[state]);
@@ -397,7 +393,7 @@ function find_definition (target_graphite, options) {
             var _processEventsData = function() {
                 var min_d = new Date(date_range.min_date * 1000),
                     max_d = new Date(date_range.max_date * 1000),
-                    span = Math.round((max_d - min_d) / 1000 ); // in seconds
+                    span = Math.round((max_d - min_d) / 1000); // in seconds
                     // the ideal width in s (big enough so you can click it, small enough so they don't annoy)
                     // what looks about right, is 360s for a 24h period and no more than 20 events,
                     // and should be wider if period is more, but smaller the more events we have.
@@ -429,7 +425,7 @@ function find_definition (target_graphite, options) {
                         },
                         bars: {
                             show: true,
-                            barWidth: width * 1000,
+                            barWidth: width * (span * 0.01 / events.length),
                             align: 'center',
                             lineWidth: 1,
                             fill: 1
@@ -464,12 +460,13 @@ function find_definition (target_graphite, options) {
                     ranges.yaxis.to = ranges.yaxis.from + 0.00001;
                 }
 
+                date_range.min_date = ranges.xaxis.from / 1000;
+                date_range.max_date = ranges.xaxis.to / 1000;
+
                 // do the zooming
                 zoom_opts = buildFlotOptions(options);
                 zoom_opts.xaxis.min = ranges.xaxis.from;
                 zoom_opts.xaxis.max = ranges.xaxis.to;
-                date_range.min_date = ranges.xaxis.from;
-                date_range.max_date = ranges.xaxis.to;
 
                 if (zoom_opts.yaxis) {
                     zoom_opts.yaxis.min = ranges.yaxis.from;
