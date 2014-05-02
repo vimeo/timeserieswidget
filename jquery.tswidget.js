@@ -25,10 +25,10 @@ function build_graphite_options(options, raw) {
                          'thickness', 'min', 'max', 'tz'];
 
     if(raw) {
-        options['format'] = 'json';
+        options.format = 'json';
     } else {
         // use random parameter to force image refresh
-        options["_t"] = options["_t"] || Math.random();
+        options._t = options._t || Math.random();
     }
 
     $.each(options, function (key, value) {
@@ -60,6 +60,7 @@ function build_graphite_options(options, raw) {
             clean_options.push(key + "=" + encodeURIComponent(value));
         }
     });
+    
     return clean_options;
 }
 
@@ -80,7 +81,7 @@ function build_graphite_url(options) {
 
 function find_definition (target_graphite, options) {
     var matching_i;
-    for (var cfg_i = 0; cfg_i < options.targets.length && matching_i == undefined; cfg_i++) {
+    for (var cfg_i = 0; cfg_i < options.targets.length && matching_i === undefined; cfg_i++) {
         // string match (no globbing)
         if(options.targets[cfg_i].target == target_graphite.target) {
             matching_i = cfg_i;
@@ -91,8 +92,8 @@ function find_definition (target_graphite, options) {
         }
     }
     if (matching_i === undefined) {
-        console.error ("internal error: could not figure out which target_option target_graphite '" +
-                target_graphite.target + "' comes from");
+        console.error("internal error: could not figure out which target_option target_graphite '" +
+            target_graphite.target + "' comes from");
         return [];
     }
     return options.targets[matching_i];
@@ -116,15 +117,15 @@ function find_definition (target_graphite, options) {
     definitions below are from http://graphite.readthedocs.org/en/1.0/url-api.html
     */
     var default_graphite_options = {
-        'bgcolor': '#000000', // background color of the graph
-        'fgcolor' : '#ffffff',  // title, legend text, and axis labels
-        'majorLine': '#ffffff',
-        'minorLine': '#afafaf'
+        bgcolor: '#000000', // background color of the graph
+        fgcolor : '#ffffff',  // title, legend text, and axis labels
+        majorLine: '#ffffff',
+        minorLine: '#afafaf'
     };
     var default_tswidget_options = {
-        'events_color': '#ccff66',
-        'es_events_color': '#ff0066',
-        'events_text_color': '#5C991F'
+        events_color: '#ccff66',
+        es_events_color: '#ff0066',
+        events_text_color: '#5C991F'
     };
 
     $.fn.graphite = function (options) {
@@ -373,14 +374,20 @@ function find_definition (target_graphite, options) {
             };
 
             var _addEventsYAxis = function(opts) {
-                var y_axes = [], init_y = $.extend({}, opts.yaxis);
-                y_axes.push(init_y, {
+                var events_axis = {
                     min: 0,
                     max: 1,
                     show: false
-                });
-                opts.yaxes = y_axes;
-                delete opts.yaxis;
+                };
+                if (opts.yaxes && opts.yaxes.length) {
+                    opts.yaxes.push(events_axis);
+                }
+                else {
+                    var y_axes = [], init_y = $.extend({}, opts.yaxis);
+                    y_axes.push(init_y, events_axis);
+                    opts.yaxes = y_axes;
+                    delete opts.yaxis;
+                }
             };
 
             var _processEventsData = function() {
@@ -395,7 +402,7 @@ function find_definition (target_graphite, options) {
                     // X = (width * num_events) / span
                     // X = 360 * 20 / 24*60*60
                     // X = 0.083
-                    if(events.length == 0) {
+                    if(!events.length) {
                         width = 0;
                     } else {
                         width = 0.083 * span / events.length;
@@ -470,9 +477,9 @@ function find_definition (target_graphite, options) {
                 plot = $.plot($div[0], all_targets, zoom_opts);
             });
 
-            if (options['line_stack_toggle']) {
-                var form = document.getElementById(options['line_stack_toggle']);
-                if(options['state'] == 'stacked') {
+            if (options.line_stack_toggle) {
+                var form = document.getElementById(options.line_stack_toggle);
+                if(options.state == 'stacked') {
                     lines_checked = '';
                     stacked_checked = ' checked';
                 } else {
@@ -486,7 +493,7 @@ function find_definition (target_graphite, options) {
 
                 form.addEventListener('change', function(e) {
                     var mode = e.target.value;
-                    options['state'] = mode;
+                    options.state = mode;
                     $.plot($div[0], all_targets, buildFlotOptions(options));
                 }, false);
             }
@@ -524,7 +531,7 @@ function find_definition (target_graphite, options) {
                 unix_timestamp = pos.x / 1000;
                 val = pos.y;
                 if (item && options.on_click && typeof options.on_click === 'function') {
-                    options.on_click(item['series']['label'], unix_timestamp, val, event);
+                    options.on_click(item.series.label, unix_timestamp, val, event);
                 }
             });
 
@@ -547,12 +554,14 @@ function find_definition (target_graphite, options) {
                         "<br/>UTC Time: " + date.toUTCString() +
                         "<br/><br/><p>" + event_data.fields.desc + "</p>" +
                         "Tags: " + event_data.fields.tags;
+
                     if ('anthracite_url' in options) {
-                        view_url = options['anthracite_url'] + "/events/view/" + event_data._id;
-                        edit_url = options['anthracite_url'] + "/events/edit/" + event_data._id;
+                        view_url = options.anthracite_url + "/events/view/" + event_data._id;
+                        edit_url = options.anthracite_url + "/events/edit/" + event_data._id;
                         tooltip_html += "<br/> - <a href='" + view_url + "'>inspect</a> - " +
                             "<a href='" + edit_url + "'>edit</a>";
                     }
+
                     showTooltip(item.pageX, item.pageY, tooltip_html);
                 }
                 else {
@@ -574,11 +583,13 @@ function find_definition (target_graphite, options) {
             es_post;
 
         requests.push($.ajax({
-            accepts: {text: 'application/json'},
+            accepts: {
+                text: 'application/json'
+            },
             cache: false,
             dataType: 'json',
-            url: options['graphite_url'],
-            type: "POST",
+            url: options.graphite_url,
+            type: 'POST',
             data: data.join('&'),
             success: function(data, textStatus, jqXHR ) {
                 if(data.length == 0 ) {
@@ -592,10 +603,10 @@ function find_definition (target_graphite, options) {
             }
         }));
 
-        if('events_url' in options){
+        if (options.events_url) {
             events_query = "*";  // this will internally map to Lucene MatchAllDocsQuery, which is efficient
-            if('events_query' in options) {
-                events_query = options['events_query'];
+            if(options.events_query) {
+                events_query = options.events_query;
             }
             // if 'events_query' is "", it'll return no docs
             // see http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#_empty_query
@@ -637,7 +648,7 @@ function find_definition (target_graphite, options) {
                     }),
                     cache: false,
                     url: options.events_url,
-                    success: function(data, textStatus, jqXHR ) {
+                    success: function(data, textStatus, jqXHR) {
                         events = data.hits.hits;
                         drawFlot();
                     },
@@ -659,6 +670,7 @@ function find_definition (target_graphite, options) {
         }
     };
 
+    // Rickshaw Render _________________________________________________________
     $.fn.graphiteRick.render = function(div, options, on_error) {
         $div = $(div);
         $div.attr("height", options.height);
@@ -782,6 +794,7 @@ function find_definition (target_graphite, options) {
           }).done(drawRick);
     };
 
+    // Highcharts Render _______________________________________________________
     $.fn.graphiteHighcharts.render = function(div, options, on_error) {
         var id = div.getAttribute('id');
         $div = $(div);
