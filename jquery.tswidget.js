@@ -128,6 +128,12 @@ function find_definition (target_graphite, options) {
         events_text_color: '#5C991F'
     };
 
+    // reference for min and max dates for events
+    var date_range = {
+        min_date: null,
+        max_date: null
+    };
+
     $.fn.graphite = function (options) {
         if (options === "update") {
             $.fn.graphite.update(this, arguments[1]);
@@ -223,13 +229,11 @@ function find_definition (target_graphite, options) {
         var id = $div.attr('id'),
             events = [],
             all_targets = [],
-            min_date = null,
-            max_date = null,
             add_targets = function(response_data) {
 
                 // store min and max X value to be able to get time range for event values
-                min_date = response_data[0].datapoints[0][1];
-                max_date = response_data[0].datapoints[response_data[0].datapoints.length - 1][1];
+                date_range.min_date = response_data[0].datapoints[0][1];
+                date_range.max_date = response_data[0].datapoints[response_data[0].datapoints.length - 1][1];
 
                 for (var res_i = 0; res_i < response_data.length; res_i++) {
                     var target = find_definition(response_data[res_i], options);
@@ -238,9 +242,9 @@ function find_definition (target_graphite, options) {
                     var nulls = 0;
                     var non_nulls = 0;
                     for (var i in response_data[res_i].datapoints) {
-                        if(response_data[res_i].datapoints[i][0] == null) {
+                        if(response_data[res_i].datapoints[i][0] === null) {
                             nulls++;
-                            if('drawNullAsZero' in options && options['drawNullAsZero']) {
+                            if(options.drawNullAsZero) {
                                 response_data[res_i].datapoints[i][0] = 0;
                             } else {
                                 // don't tell flot about null values, it prevents adjacent non-null values from
@@ -391,8 +395,8 @@ function find_definition (target_graphite, options) {
             };
 
             var _processEventsData = function() {
-                var min_d = new Date(min_date * 1000),
-                    max_d = new Date(max_date * 1000),
+                var min_d = new Date(date_range.min_date * 1000),
+                    max_d = new Date(date_range.max_date * 1000),
                     span = Math.round((max_d - min_d) / 1000 ); // in seconds
                     // the ideal width in s (big enough so you can click it, small enough so they don't annoy)
                     // what looks about right, is 360s for a 24h period and no more than 20 events,
@@ -464,6 +468,8 @@ function find_definition (target_graphite, options) {
                 zoom_opts = buildFlotOptions(options);
                 zoom_opts.xaxis.min = ranges.xaxis.from;
                 zoom_opts.xaxis.max = ranges.xaxis.to;
+                date_range.min_date = ranges.xaxis.from;
+                date_range.max_date = ranges.xaxis.to;
 
                 if (zoom_opts.yaxis) {
                     zoom_opts.yaxis.min = ranges.yaxis.from;
@@ -554,14 +560,12 @@ function find_definition (target_graphite, options) {
                         "<br/>UTC Time: " + date.toUTCString() +
                         "<br/><br/><p>" + event_data.fields.desc + "</p>" +
                         "Tags: " + event_data.fields.tags;
-
                     if ('anthracite_url' in options) {
                         view_url = options.anthracite_url + "/events/view/" + event_data._id;
                         edit_url = options.anthracite_url + "/events/edit/" + event_data._id;
                         tooltip_html += "<br/> - <a href='" + view_url + "'>inspect</a> - " +
                             "<a href='" + edit_url + "'>edit</a>";
                     }
-
                     showTooltip(item.pageX, item.pageY, tooltip_html);
                 }
                 else {
@@ -630,8 +634,8 @@ function find_definition (target_graphite, options) {
                                 filter: {
                                     range: {
                                         "event.date": {
-                                            from: min_date * 1000,
-                                            to: max_date * 1000
+                                            from: date_range.min_date * 1000,
+                                            to: date_range.max_date * 1000
                                         }
                                     }
                                 }
