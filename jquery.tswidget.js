@@ -134,6 +134,10 @@ function find_definition (target_graphite, options) {
         max_date: null
     };
 
+    // maintain ref to event_series at a higher scope to be
+    // able to remove from data array
+    var event_series;
+
     $.fn.graphite = function (options) {
         if (options === "update") {
             $.fn.graphite.update(this, arguments[1]);
@@ -394,6 +398,7 @@ function find_definition (target_graphite, options) {
                 var min_d = new Date(date_range.min_date * 1000),
                     max_d = new Date(date_range.max_date * 1000),
                     span = Math.round((max_d - min_d) / 1000); // in seconds
+
                     // the ideal width in s (big enough so you can click it, small enough so they don't annoy)
                     // what looks about right, is 360s for a 24h period and no more than 20 events,
                     // and should be wider if period is more, but smaller the more events we have.
@@ -407,15 +412,17 @@ function find_definition (target_graphite, options) {
                     } else {
                         width = 0.083 * span / events.length;
                     }
+
                     // however, if there's not a lot of events, we don't want the width to become absurdly big.
                     // "big enough" is 15min in a 24h interval
                     // max_width = Y * span
                     // Y = max_width/span
                     // Y = 15*60 / 24*60*60
                     // Y = 0.01
-                    max_width = 0.01 * span;
+                    var max_width = 0.01 * span;
                     width = Math.min(width, max_width);
-                    event_series = {
+
+                    var new_event_series = {
                         data: [],
                         stack: 0,
                         hoverable: true,
@@ -425,7 +432,7 @@ function find_definition (target_graphite, options) {
                         },
                         bars: {
                             show: true,
-                            barWidth: width * (span * 0.01 / events.length),
+                            barWidth: width * 1000,
                             align: 'center',
                             lineWidth: 1,
                             fill: 1
@@ -437,12 +444,15 @@ function find_definition (target_graphite, options) {
                 // events loop
                 for (var i = 0; i < events.length; i++) {
                     x = events[i].fields.date;
-                    event_series.data.push([x,1]);
+                    new_event_series.data.push([x,1]);
                 }
 
-                // TODO: configure barWidth dependent upon amount of events and time span
-
-                if (event_series.data.length) {
+                if (new_event_series.data.length) {
+                    var old_events_idx = all_targets.indexOf(event_series);
+                    if (old_events_idx > -1) {
+                        all_targets.splice(old_events_idx, 1);
+                    }
+                    event_series = new_event_series;
                     all_targets.push(event_series);
                 }
             };
