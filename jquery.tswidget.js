@@ -817,7 +817,15 @@ function find_definition (target_graphite, options) {
         $div = $(div);
         $div.height(options.height);
         $div.width(options.width);
+
         var drawHighcharts = function(resp_graphite) {
+            options['xAxis'] = options['xAxis'] || {};
+            options['yAxis'] = options['yAxis'] || {};
+
+            for (i = 0; i < options['targets'].length; i++ ) {
+                options['targets'][i]['color'] = options['targets'][i]['color'];
+            }
+
             var hsoptions = {
                 chart: {
                     renderTo: id,
@@ -876,7 +884,7 @@ function find_definition (target_graphite, options) {
                         color: options.fgcolor
                     }
                 },
-                xAxis: {
+                xAxis: $.extend({},{
                     type: 'datetime',
                     tickPixelInterval: 50,
                     labels: {
@@ -888,8 +896,8 @@ function find_definition (target_graphite, options) {
                     maxPadding: 0.01,
                     minPadding: 0.01,
                     gridLineWidth: 0.2
-                },
-                yAxis: {
+                }, options['xAxis']),
+                yAxis: $.extend({},{
                     gridLineColor: 'rgba(255, 255, 255, .3)',
                     minorGridLineColor: 'rgba(255,255,255,0.1)',
                     title: {
@@ -898,7 +906,7 @@ function find_definition (target_graphite, options) {
                     },
                     maxPadding: 0.01,
                     minPadding: 0.01
-                },
+                }, options['yAxis']),
                 tooltip: {
                     enabled: options.hover_details,
                     crosshairs:[{width:1, color:'#ccc'},{width:1, color:'#ccc'}],
@@ -922,6 +930,7 @@ function find_definition (target_graphite, options) {
                 },
                 series: []
             }; 
+
             for (var res_i = 0; res_i < resp_graphite.length; res_i++) {
                 var target = find_definition(resp_graphite[res_i], options);
                 var hstarget = {
@@ -940,9 +949,11 @@ function find_definition (target_graphite, options) {
                     type: "line",
                     animation: false
                 };
-                if (options.legend && options.legend.labelFormatter) {
-                    hstarget.name = options.legend.labelFormatter(target.name);
+                if (!(options.legend && options.legend.labelFormatter)) {
+                    options.legend = { enabled:!0, align:"center", layout:"horizontal", labelFormatter:function(name){return name} }
                 }
+                hstarget.name = options.legend.labelFormatter(target.name);
+                hstarget.color = target['color'];
                 hstarget.graphite_metric = target.graphite_metric;
                 if (options["series"] && options["series"].stack) {
                     hstarget.type = "area";
